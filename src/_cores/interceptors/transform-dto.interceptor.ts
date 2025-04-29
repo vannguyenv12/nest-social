@@ -26,11 +26,11 @@ export class TransformDTOInterceptor<T> implements NestInterceptor {
     return next.handle().pipe(
       map((data) => {
         if (isAuthenticationUrl) {
-          const { savedUser, accessToken } = data;
+          const { user, accessToken } = data;
 
           return {
             message: 'success',
-            data: plainToInstance(this.dtoClass, savedUser, {
+            data: plainToInstance(this.dtoClass, user, {
               excludeExtraneousValues: true,
             }),
             accessToken: accessToken,

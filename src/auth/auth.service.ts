@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
-import { SignUpDto } from './dto/create-auth.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { SignUpDto } from './dto/sign-up.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from 'src/user/schemas/user.schema';
 import { Model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { SignInDto } from './dto/sign-in.dto';
 
 const SALT = 10;
 
@@ -15,7 +16,7 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async create(signUpDto: SignUpDto) {
+  async signUp(signUpDto: SignUpDto) {
     const { email, name, password } = signUpDto;
     // Create a new user
     const hashedPassword = await bcrypt.hash(password, SALT);
@@ -32,7 +33,31 @@ export class AuthService {
     };
     const accessToken = await this.jwtService.signAsync(payload);
 
-    return { savedUser, accessToken };
+    return { user: savedUser, accessToken };
+  }
+
+  async signIn(signInDto: SignInDto) {
+    const { email, password } = signInDto;
+    // 1) Find user by email
+    const user = await this.userModel.findOne({ email });
+    if (!user) {
+      throw new NotFoundException('Bad Credentials');
+    }
+    // 2) Check for password
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      throw new NotFoundException('Bad Credentials');
+    }
+    // 3) Generate JWT
+    // Generate JWT
+    const payload = {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+    };
+    const accessToken = await this.jwtService.signAsync(payload);
+
+    return { user, accessToken };
   }
 
   findAll() {
