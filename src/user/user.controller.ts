@@ -6,14 +6,22 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { AuthGuard } from 'src/_cores/guards/auth.guard';
 
 @Controller('users')
+@UseGuards(AuthGuard)
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
+  @Get('/profile')
+  getCurrentUser() {
+    return 'Get a user';
+  }
 
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
