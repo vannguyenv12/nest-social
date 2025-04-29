@@ -1,22 +1,17 @@
 import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignUpDto } from './dto/create-auth.dto';
+import { TransformDTO } from 'src/_cores/interceptors/transform-dto.interceptor';
+import { ResponseAuthDto } from './dto/response-auth.dto';
 
 @Controller('auth')
+@TransformDTO(ResponseAuthDto)
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('/sign-up')
   async create(@Body() signUpDto: SignUpDto) {
-    const user = await this.authService.create(signUpDto);
-
-    return {
-      message: 'success',
-      data: {
-        name: user.name,
-        email: user.email,
-      },
-    };
+    return this.authService.create(signUpDto);
   }
 
   @Get()
