@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { SignUpDto } from './dto/sign-up.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from 'src/user/schemas/user.schema';
@@ -18,6 +22,12 @@ export class AuthService {
 
   async signUp(signUpDto: SignUpDto) {
     const { email, name, password } = signUpDto;
+
+    const userByEmail = await this.userModel.findOne({ email });
+    if (userByEmail) {
+      throw new BadRequestException('Email already in use!');
+    }
+
     // Create a new user
     const hashedPassword = await bcrypt.hash(password, SALT);
 
