@@ -7,4 +7,6 @@ export class ResponseUserDto {
   name: string;
   @Expose()
   email: string;
+  @Expose()
+  role: string;
 }
