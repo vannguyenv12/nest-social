@@ -12,7 +12,7 @@ export class User {
   @Prop()
   password: string;
   @Prop({ default: 'user' })
-  role: 'user' | 'admin';
+  role: IRole;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

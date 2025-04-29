@@ -5,6 +5,8 @@ interface IUserPayload {
   role: string;
 }
 
+type IRole = 'user' | 'admin';
+
 declare namespace Express {
   export interface Request {
     currentUser: IUserPayload;
