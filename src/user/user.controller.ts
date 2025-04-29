@@ -12,15 +12,20 @@ import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthGuard } from 'src/_cores/guards/auth.guard';
+import { Request } from 'express';
+import { CurrentUser } from 'src/_cores/decorators/current-user.decorator';
+import { TransformDTO } from 'src/_cores/interceptors/transform-dto.interceptor';
+import { ResponseUserDto } from './dto/response-user.dto';
 
 @Controller('users')
 @UseGuards(AuthGuard)
+@TransformDTO(ResponseUserDto)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get('/profile')
-  getCurrentUser() {
-    return 'Get a user';
+  getCurrentUser(@CurrentUser() currentUser: IUserPayload) {
+    return currentUser;
   }
 
   @Post()
