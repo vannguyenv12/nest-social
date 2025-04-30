@@ -54,4 +54,6 @@ export class ResponsePostDto {
   @Expose()
   @Transform(({ obj }: { obj: PostDocument }) => obj?.author?.email)
   authorEmail: string;
+  @Expose()
+  myReaction: IReactionType;
 }

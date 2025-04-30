@@ -48,15 +48,41 @@ export class PostService {
     await post.save();
   }
 
-  findAll() {
-    return this.postModel.find().populate('author');
+  async findAll(currentUser: IUserPayload) {
+    const posts = await this.postModel.find().populate('author').lean();
+
+    const postsWithReaction = await Promise.all(
+      posts.map(async (post) => {
+        const myReaction = await this.reactionService.findExisting(
+          post._id.toString(),
+          currentUser._id,
+        );
+
+        return { ...post, myReaction: myReaction?.type };
+      }),
+    );
+
+    return postsWithReaction;
   }
 
-  async findOne(id: string) {
+  private async findOne(id: string) {
     const post = await this.postModel.findById(id);
     if (!post) throw new NotFoundException('Post not found');
 
     return post;
+  }
+
+  async findOneWithMyReaction(id: string, currentUser: IUserPayload) {
+    const post = await this.postModel.findById(id).lean();
+    if (!post) throw new NotFoundException('Post not found');
+
+    const myReaction = await this.reactionService.findExisting(
+      post._id.toString(),
+      currentUser._id,
+    );
+
+    // return post;
+    return { ...post, myReaction: myReaction?.type };
   }
 
   async update(id: string, updatePostDto: UpdatePostDto) {
