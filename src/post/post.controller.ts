@@ -20,6 +20,7 @@ import { CurrentUser } from 'src/_cores/decorators/current-user.decorator';
 import { ParseObjectIdPipe } from 'src/_cores/pipes/parse-object-id.pipe';
 import { UploadMediaDto } from './dto/upload-media.dto';
 import { DeleteMediaDto } from './dto/delete-media.dto';
+import { AddReactionDto } from './dto/add-reaction.dto';
 
 @Controller('posts')
 @TransformDTO(ResponsePostDto)
@@ -33,6 +34,14 @@ export class PostController {
     @CurrentUser() currentUser: IUserPayload,
   ) {
     return this.postService.create(createPostDto, currentUser);
+  }
+
+  @Post('reaction')
+  addReaction(
+    @Body() addReactionDto: AddReactionDto,
+    @CurrentUser() currentUser: IUserPayload,
+  ) {
+    return this.postService.addReaction(addReactionDto, currentUser);
   }
 
   @Patch(':id/upload')

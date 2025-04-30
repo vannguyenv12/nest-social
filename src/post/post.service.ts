@@ -4,15 +4,16 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Post } from './schemas/post.schema';
 import { Model } from 'mongoose';
-import { User } from 'src/user/schemas/user.schema';
 import { UploadMediaDto } from './dto/upload-media.dto';
 import { DeleteMediaDto } from './dto/delete-media.dto';
+import { AddReactionDto } from './dto/add-reaction.dto';
+import { ReactionService } from 'src/reaction/reaction.service';
 
 @Injectable()
 export class PostService {
   constructor(
     @InjectModel(Post.name) private postModel: Model<Post>,
-    @InjectModel(User.name) private userModel: Model<User>,
+    private reactionService: ReactionService,
   ) {}
 
   create(createPostDto: CreatePostDto, currentUser: IUserPayload) {
@@ -72,5 +73,25 @@ export class PostService {
     if (!post) {
       throw new NotFoundException('Post not found');
     }
+  }
+
+  async addReaction(addReactionDto: AddReactionDto, currentUser: IUserPayload) {
+    const { postId, type } = addReactionDto;
+    const existingReaction = await this.reactionService.findExisting(
+      postId,
+      currentUser._id,
+    );
+
+    if (existingReaction) {
+      // NOT DO ANYTHING IF new reaction === existingReaction
+      if (type === existingReaction.type) return;
+      // Update with the new reaction
+      await this.reactionService.update(existingReaction._id.toString(), type);
+    } else {
+      // Create the reaction for post
+      await this.reactionService.create(addReactionDto, currentUser);
+    }
+
+    // UPDATE REACTION COUNTS
   }
 }
