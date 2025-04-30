@@ -6,6 +6,7 @@ interface IUserPayload {
 }
 
 type IRole = 'user' | 'admin';
+type IPrivacy = 'public' | 'private' | 'friends';
 
 declare namespace Express {
   export interface Request {
