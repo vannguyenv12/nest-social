@@ -13,7 +13,11 @@ export class PostService {
     @InjectModel(User.name) private userModel: Model<User>,
   ) {}
 
-  async create(createPostDto: CreatePostDto) {}
+  create(createPostDto: CreatePostDto) {
+    const newPost = new this.postModel(createPostDto);
+
+    return newPost.save();
+  }
 
   findAll() {
     return `This action returns all post`;

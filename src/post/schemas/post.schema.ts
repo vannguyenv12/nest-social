@@ -8,6 +8,8 @@ export type PostDocument = HydratedDocument<Post>;
 export class Post {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
   author: UserDocument;
+  @Prop({ default: '#fff' })
+  backgroundColor: string;
   @Prop()
   content: string;
   @Prop()
