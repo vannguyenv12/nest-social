@@ -1,6 +1,27 @@
-import { Expose, Transform } from 'class-transformer';
-import { MediaType, PostDocument } from '../schemas/post.schema';
+import { Expose, Transform, Type } from 'class-transformer';
 import { ObjectId } from 'src/_cores/decorators/object-id.decorator';
+import { PostDocument } from '../schemas/post.schema';
+
+// https://res.cloudinary.com/dir7wnely/image/upload/v1746002210/oecsqxrwxsxxyjmawzlz.png
+
+export class MediaType {
+  @Expose()
+  @Transform(
+    ({ obj }) =>
+      `https://res.cloudinary.com/${process.env.CLOUDINARY_NAME}/image/upload/v${obj.version}/${obj.display_name}.${obj.format}`,
+  )
+  url: string;
+  @Expose()
+  public_id: string;
+  @Expose()
+  version: number;
+  @Expose()
+  display_name: string;
+  @Expose()
+  format: string;
+  @Expose()
+  resource_type: string;
+}
 
 export class ResponsePostDto {
   @Expose()
@@ -11,6 +32,7 @@ export class ResponsePostDto {
   @Expose()
   content: string;
   @Expose()
+  @Type(() => MediaType)
   mediaFiles: MediaType[];
   @Expose()
   privacy: IPrivacy;

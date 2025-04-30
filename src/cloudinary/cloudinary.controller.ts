@@ -21,7 +21,6 @@ export class CloudinaryController {
     return {
       message: 'success',
       data: {
-        url: result.secure_url,
         public_id: result.public_id,
         version: result.version,
         display_name: result.display_name,
@@ -41,7 +40,6 @@ export class CloudinaryController {
       message: 'success',
       data: result.map((r) => {
         return {
-          url: r.secure_url,
           public_id: r.public_id,
           version: r.version,
           display_name: r.display_name,
