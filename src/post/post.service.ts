@@ -13,14 +13,17 @@ export class PostService {
     @InjectModel(User.name) private userModel: Model<User>,
   ) {}
 
-  create(createPostDto: CreatePostDto) {
-    const newPost = new this.postModel(createPostDto);
+  create(createPostDto: CreatePostDto, currentUser: IUserPayload) {
+    const newPost = new this.postModel({
+      ...createPostDto,
+      author: currentUser,
+    });
 
     return newPost.save();
   }
 
   findAll() {
-    return `This action returns all post`;
+    return this.postModel.find().populate('author');
   }
 
   findOne(id: number) {

@@ -16,6 +16,7 @@ import { RoleGuard } from 'src/_cores/guards/role.guard';
 import { Roles } from 'src/_cores/decorators/role.decorator';
 import { TransformDTO } from 'src/_cores/interceptors/transform-dto.interceptor';
 import { ResponsePostDto } from './dto/response-post.dto';
+import { CurrentUser } from 'src/_cores/decorators/current-user.decorator';
 
 @Controller('posts')
 @TransformDTO(ResponsePostDto)
@@ -24,8 +25,11 @@ export class PostController {
   constructor(private readonly postService: PostService) {}
 
   @Post()
-  create(@Body() createPostDto: CreatePostDto) {
-    return this.postService.create(createPostDto);
+  create(
+    @Body() createPostDto: CreatePostDto,
+    @CurrentUser() currentUser: IUserPayload,
+  ) {
+    return this.postService.create(createPostDto, currentUser);
   }
 
   @Get()
