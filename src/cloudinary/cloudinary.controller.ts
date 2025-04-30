@@ -13,7 +13,19 @@ export class CloudinaryController {
 
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
-  uploadImage(@UploadedFile() file: Express.Multer.File) {
-    return this.cloudinaryService.uploadFile(file);
+  async uploadImage(@UploadedFile() file: Express.Multer.File) {
+    // https://res.cloudinary.com/dir7wnely/image/upload/v1745998484/mlckh5qvjyrczdczvigr.jpg
+    const result = await this.cloudinaryService.uploadFile(file);
+
+    return {
+      message: 'success',
+      data: {
+        url: result.secure_url,
+        version: result.version,
+        display_name: result.display_name,
+        format: result.format,
+        resource_type: result.resource_type,
+      },
+    };
   }
 }
