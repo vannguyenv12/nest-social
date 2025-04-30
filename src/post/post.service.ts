@@ -5,6 +5,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Post } from './schemas/post.schema';
 import { Model } from 'mongoose';
 import { User } from 'src/user/schemas/user.schema';
+import { UploadMediaDto } from './dto/upload-media.dto';
 
 @Injectable()
 export class PostService {
@@ -20,6 +21,17 @@ export class PostService {
     });
 
     return newPost.save();
+  }
+
+  async uploadMedia(id: string, uploadMediaDtos: UploadMediaDto[]) {
+    const post = await this.postModel.findById(id);
+    if (!post) throw new NotFoundException('Post not found');
+
+    uploadMediaDtos.forEach((mediaDto) => {
+      post.mediaUrls.push(mediaDto);
+    });
+
+    await post.save();
   }
 
   findAll() {

@@ -1,5 +1,5 @@
 import { Expose, Transform } from 'class-transformer';
-import { PostDocument } from '../schemas/post.schema';
+import { MediaType, PostDocument } from '../schemas/post.schema';
 import { ObjectId } from 'src/_cores/decorators/object-id.decorator';
 
 export class ResponsePostDto {
@@ -11,7 +11,7 @@ export class ResponsePostDto {
   @Expose()
   content: string;
   @Expose()
-  mediaUrls: string[];
+  mediaUrls: MediaType[];
   @Expose()
   privacy: IPrivacy;
   @Expose()
