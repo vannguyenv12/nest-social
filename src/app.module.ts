@@ -8,6 +8,7 @@ import { AuthModule } from './auth/auth.module';
 import { PostModule } from './post/post.module';
 import { ResourceModule } from './resource/resource.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { ReactionModule } from './reaction/reaction.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
     PostModule,
     ResourceModule,
     CloudinaryModule,
+    ReactionModule,
   ],
   controllers: [AppController],
   providers: [AppService],

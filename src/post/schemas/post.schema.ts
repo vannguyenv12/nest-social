@@ -22,6 +22,8 @@ export class Post {
   content: string;
   @Prop({ default: [] })
   mediaFiles: MediaType[];
+  @Prop({ default: {} })
+  reactionsCount: Map<IReactionType, number>;
   @Prop({ enum: ['public', 'private', 'friends'], default: 'public' })
   privacy: IPrivacy;
 }

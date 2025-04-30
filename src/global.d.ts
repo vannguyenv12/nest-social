@@ -7,6 +7,7 @@ interface IUserPayload {
 
 type IRole = 'user' | 'admin';
 type IPrivacy = 'public' | 'private' | 'friends';
+type IReactionType = 'like' | 'wow' | 'love' | 'angry' | 'haha' | 'happy';
 
 declare namespace Express {
   export interface Request {
