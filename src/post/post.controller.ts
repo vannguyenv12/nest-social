@@ -14,8 +14,11 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { AuthGuard } from 'src/_cores/guards/auth.guard';
 import { RoleGuard } from 'src/_cores/guards/role.guard';
 import { Roles } from 'src/_cores/decorators/role.decorator';
+import { TransformDTO } from 'src/_cores/interceptors/transform-dto.interceptor';
+import { ResponsePostDto } from './dto/response-post.dto';
 
 @Controller('posts')
+@TransformDTO(ResponsePostDto)
 @UseGuards(AuthGuard, RoleGuard)
 export class PostController {
   constructor(private readonly postService: PostService) {}
