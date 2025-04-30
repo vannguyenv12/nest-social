@@ -51,8 +51,11 @@ export class PostService {
     return this.postModel.find().populate('author');
   }
 
-  findOne(id: string) {
-    return this.postModel.findById(id);
+  async findOne(id: string) {
+    const post = await this.postModel.findById(id);
+    if (!post) throw new NotFoundException('Post not found');
+
+    return post;
   }
 
   async update(id: string, updatePostDto: UpdatePostDto) {
@@ -77,21 +80,38 @@ export class PostService {
 
   async addReaction(addReactionDto: AddReactionDto, currentUser: IUserPayload) {
     const { postId, type } = addReactionDto;
+    const post = await this.findOne(postId);
+
     const existingReaction = await this.reactionService.findExisting(
       postId,
       currentUser._id,
     );
 
+    let oldReactionType: IReactionType | null = null;
+
     if (existingReaction) {
       // NOT DO ANYTHING IF new reaction === existingReaction
       if (type === existingReaction.type) return;
       // Update with the new reaction
+      oldReactionType = existingReaction.type;
       await this.reactionService.update(existingReaction._id.toString(), type);
     } else {
       // Create the reaction for post
       await this.reactionService.create(addReactionDto, currentUser);
     }
 
-    // UPDATE REACTION COUNTS
+    // *** UPDATE REACTION COUNTS
+    const reactionCounts = post.reactionsCount;
+    // decrease count
+    if (oldReactionType) {
+      const value = reactionCounts.get(oldReactionType) || 0;
+      reactionCounts.set(oldReactionType, value - 1 >= 0 ? value - 1 : 0);
+    }
+    // increase count
+    const value = reactionCounts.get(type) || 0;
+    reactionCounts.set(type, value + 1);
+
+    post.reactionsCount = reactionCounts;
+    await post.save();
   }
 }
