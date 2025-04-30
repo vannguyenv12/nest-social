@@ -42,7 +42,11 @@ export class PostService {
     return post;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} post`;
+  async remove(id: string) {
+    const post = await this.postModel.findByIdAndDelete(id);
+
+    if (!post) {
+      throw new NotFoundException('Post not found');
+    }
   }
 }

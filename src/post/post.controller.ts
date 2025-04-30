@@ -17,6 +17,7 @@ import { Roles } from 'src/_cores/decorators/role.decorator';
 import { TransformDTO } from 'src/_cores/interceptors/transform-dto.interceptor';
 import { ResponsePostDto } from './dto/response-post.dto';
 import { CurrentUser } from 'src/_cores/decorators/current-user.decorator';
+import { ParseObjectIdPipe } from 'src/_cores/pipes/parse-object-id.pipe';
 
 @Controller('posts')
 @TransformDTO(ResponsePostDto)
@@ -38,18 +39,21 @@ export class PostController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', ParseObjectIdPipe) id: string) {
     return this.postService.findOne(id);
   }
 
   @Patch(':id')
   @Roles('admin', 'user')
-  update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
+  update(
+    @Param('id', ParseObjectIdPipe) id: string,
+    @Body() updatePostDto: UpdatePostDto,
+  ) {
     return this.postService.update(id, updatePostDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.postService.remove(+id);
+  remove(@Param('id', ParseObjectIdPipe) id: string) {
+    return this.postService.remove(id);
   }
 }
