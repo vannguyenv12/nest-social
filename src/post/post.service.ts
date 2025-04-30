@@ -8,6 +8,7 @@ import { UploadMediaDto } from './dto/upload-media.dto';
 import { DeleteMediaDto } from './dto/delete-media.dto';
 import { AddReactionDto } from './dto/add-reaction.dto';
 import { ReactionService } from 'src/reaction/reaction.service';
+import { RemoveReactionDto } from './dto/remove-reaction.dto';
 
 @Injectable()
 export class PostService {
@@ -113,5 +114,26 @@ export class PostService {
 
     post.reactionsCount = reactionCounts;
     await post.save();
+  }
+
+  async removeReaction(
+    removeReactionDto: RemoveReactionDto,
+    currentUser: IUserPayload,
+  ) {
+    const { postId } = removeReactionDto;
+    const post = await this.findOne(postId);
+
+    const existingReaction = await this.reactionService.findExisting(
+      postId,
+      currentUser._id,
+    );
+
+    if (!existingReaction) return;
+
+    await this.reactionService.remove(existingReaction._id.toString());
+
+    await this.postModel.findByIdAndUpdate(post._id, {
+      $inc: { [`reactionsCount.${existingReaction.type}`]: -1 },
+    });
   }
 }

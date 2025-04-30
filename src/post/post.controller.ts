@@ -21,12 +21,21 @@ import { ParseObjectIdPipe } from 'src/_cores/pipes/parse-object-id.pipe';
 import { UploadMediaDto } from './dto/upload-media.dto';
 import { DeleteMediaDto } from './dto/delete-media.dto';
 import { AddReactionDto } from './dto/add-reaction.dto';
+import { RemoveReactionDto } from './dto/remove-reaction.dto';
 
 @Controller('posts')
 @TransformDTO(ResponsePostDto)
 @UseGuards(AuthGuard, RoleGuard)
 export class PostController {
   constructor(private readonly postService: PostService) {}
+
+  @Delete('reaction')
+  deleteReaction(
+    @Body() removeReactionDto: RemoveReactionDto,
+    @CurrentUser() currentUser: IUserPayload,
+  ) {
+    return this.postService.removeReaction(removeReactionDto, currentUser);
+  }
 
   @Post()
   create(
