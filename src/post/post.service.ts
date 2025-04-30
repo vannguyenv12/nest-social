@@ -26,8 +26,8 @@ export class PostService {
     return this.postModel.find().populate('author');
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} post`;
+  findOne(id: string) {
+    return this.postModel.findById(id);
   }
 
   update(id: number, updatePostDto: UpdatePostDto) {
