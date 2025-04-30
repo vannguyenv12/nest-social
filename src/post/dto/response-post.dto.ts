@@ -32,6 +32,9 @@ export class ResponsePostDto {
   @Expose()
   content: string;
   @Expose()
+  @Transform(({ obj }) => obj.reactionsCount)
+  reactionsCount: Map<IReactionType, number>;
+  @Expose()
   @Type(() => MediaType)
   mediaFiles: MediaType[];
   @Expose()
