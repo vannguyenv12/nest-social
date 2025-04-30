@@ -11,7 +11,7 @@ export class ResponsePostDto {
   @Expose()
   content: string;
   @Expose()
-  mediaUrls: MediaType[];
+  mediaFiles: MediaType[];
   @Expose()
   privacy: IPrivacy;
   @Expose()

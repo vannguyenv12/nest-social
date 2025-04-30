@@ -5,6 +5,7 @@ import { UserDocument } from 'src/user/schemas/user.schema';
 export type PostDocument = HydratedDocument<Post>;
 
 export class MediaType {
+  public_id: string;
   version: number;
   display_name: string;
   format: string;
@@ -20,7 +21,7 @@ export class Post {
   @Prop()
   content: string;
   @Prop({ default: [] })
-  mediaUrls: MediaType[];
+  mediaFiles: MediaType[];
   @Prop({ enum: ['public', 'private', 'friends'], default: 'public' })
   privacy: IPrivacy;
 }

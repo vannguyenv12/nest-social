@@ -6,6 +6,7 @@ import { Post } from './schemas/post.schema';
 import { Model } from 'mongoose';
 import { User } from 'src/user/schemas/user.schema';
 import { UploadMediaDto } from './dto/upload-media.dto';
+import { DeleteMediaDto } from './dto/delete-media.dto';
 
 @Injectable()
 export class PostService {
@@ -28,8 +29,19 @@ export class PostService {
     if (!post) throw new NotFoundException('Post not found');
 
     uploadMediaDtos.forEach((mediaDto) => {
-      post.mediaUrls.push(mediaDto);
+      post.mediaFiles.push(mediaDto);
     });
+
+    await post.save();
+  }
+
+  async removeMedia(id: string, deleteMediaDto: DeleteMediaDto) {
+    const post = await this.postModel.findById(id);
+    if (!post) throw new NotFoundException('Post not found');
+
+    post.mediaFiles = post.mediaFiles.filter(
+      (mediaFile) => mediaFile.public_id !== deleteMediaDto.mediaId,
+    );
 
     await post.save();
   }

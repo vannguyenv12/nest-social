@@ -19,6 +19,7 @@ import { ResponsePostDto } from './dto/response-post.dto';
 import { CurrentUser } from 'src/_cores/decorators/current-user.decorator';
 import { ParseObjectIdPipe } from 'src/_cores/pipes/parse-object-id.pipe';
 import { UploadMediaDto } from './dto/upload-media.dto';
+import { DeleteMediaDto } from './dto/delete-media.dto';
 
 @Controller('posts')
 @TransformDTO(ResponsePostDto)
@@ -40,6 +41,14 @@ export class PostController {
     @Body() uploadMediaDtos: UploadMediaDto[],
   ) {
     return this.postService.uploadMedia(id, uploadMediaDtos);
+  }
+
+  @Delete(':id/upload')
+  deleteMedia(
+    @Param('id', ParseObjectIdPipe) id: string,
+    @Body() deleteMediaDto: DeleteMediaDto,
+  ) {
+    return this.postService.removeMedia(id, deleteMediaDto);
   }
 
   @Get()
