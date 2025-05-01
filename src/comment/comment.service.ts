@@ -15,7 +15,7 @@ export class CommentService {
     private userService: UserService,
   ) {}
 
-  async create(createCommentDto: CreateCommentDto) {
+  async create(createCommentDto: CreateCommentDto, currentUser: IUserPayload) {
     const { postId, content, parentCommentId, replyToUserId } =
       createCommentDto;
     const post = await this.postService.findOne(postId);
@@ -43,6 +43,7 @@ export class CommentService {
     const comment = new this.commentModel({
       content,
       post,
+      userComment: currentUser._id,
       parent: realParentCommentId,
       replyToUser: realReplyToUserId,
     });

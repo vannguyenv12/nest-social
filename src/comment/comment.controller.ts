@@ -6,18 +6,25 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { CommentService } from './comment.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
+import { CurrentUser } from 'src/_cores/decorators/current-user.decorator';
+import { AuthGuard } from 'src/_cores/guards/auth.guard';
 
 @Controller('comments')
+@UseGuards(AuthGuard)
 export class CommentController {
   constructor(private readonly commentService: CommentService) {}
 
   @Post()
-  create(@Body() createCommentDto: CreateCommentDto) {
-    return this.commentService.create(createCommentDto);
+  create(
+    @Body() createCommentDto: CreateCommentDto,
+    @CurrentUser() currentUser: IUserPayload,
+  ) {
+    return this.commentService.create(createCommentDto, currentUser);
   }
 
   @Get()

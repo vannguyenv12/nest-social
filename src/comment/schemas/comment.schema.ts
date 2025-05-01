@@ -12,6 +12,8 @@ export class Comment {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Comment' })
   parent: CommentDocument | null;
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
+  userComment: UserDocument;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
   replyToUser: UserDocument | null;
 
   @Prop({ required: true })
