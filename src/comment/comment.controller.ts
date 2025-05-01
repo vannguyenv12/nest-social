@@ -14,9 +14,12 @@ import { UpdateCommentDto } from './dto/update-comment.dto';
 import { CurrentUser } from 'src/_cores/decorators/current-user.decorator';
 import { AuthGuard } from 'src/_cores/guards/auth.guard';
 import { ParseObjectIdPipe } from 'src/_cores/pipes/parse-object-id.pipe';
+import { TransformDTO } from 'src/_cores/interceptors/transform-dto.interceptor';
+import { ResponseCommentDto } from './dto/response-comment.dto';
 
 @Controller('comments')
 @UseGuards(AuthGuard)
+@TransformDTO(ResponseCommentDto)
 export class CommentController {
   constructor(private readonly commentService: CommentService) {}
 
