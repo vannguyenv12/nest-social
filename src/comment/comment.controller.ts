@@ -52,7 +52,7 @@ export class CommentController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.commentService.remove(+id);
+  remove(@Param('id', ParseObjectIdPipe) id: string) {
+    return this.commentService.remove(id);
   }
 }

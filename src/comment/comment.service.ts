@@ -92,12 +92,13 @@ export class CommentService {
       { new: true },
     );
 
-    if (!comment) throw new Error('Comment not found');
+    if (!comment) throw new NotFoundException('Comment not found');
 
     return comment;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} comment`;
+  async remove(id: string) {
+    const comment = await this.commentModel.findByIdAndDelete(id);
+    if (!comment) throw new NotFoundException('Comment not found');
   }
 }
