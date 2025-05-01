@@ -48,11 +48,24 @@ export class PostService {
     await post.save();
   }
 
-  async findAll(currentUser: IUserPayload) {
-    const posts = await this.postModel.find().populate('author').lean();
+  async findAll(currentUser: IUserPayload, limit: number, cursor: string) {
+    const query: Record<string, object> = {};
+    if (cursor) {
+      query.createdAt = { $lt: new Date(cursor) };
+    }
+
+    const posts = await this.postModel
+      .find(query)
+      .populate('author')
+      .sort({ createdAt: -1 })
+      .limit(limit + 1)
+      .lean();
+
+    const hasNextPage = posts.length > limit;
+    const items = hasNextPage ? posts.slice(0, 1) : posts;
 
     const postsWithReaction = await Promise.all(
-      posts.map(async (post) => {
+      items.map(async (post) => {
         const myReaction = await this.reactionService.findExisting(
           post._id.toString(),
           currentUser._id,
@@ -62,7 +75,11 @@ export class PostService {
       }),
     );
 
-    return postsWithReaction;
+    return {
+      items: postsWithReaction,
+      hasNextPage,
+      cursor: hasNextPage ? items[items.length - 1].createdAt : null,
+    };
   }
 
   async findOne(id: string) {

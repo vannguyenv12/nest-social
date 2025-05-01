@@ -7,6 +7,9 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
+  ParseIntPipe,
+  DefaultValuePipe,
 } from '@nestjs/common';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -70,8 +73,12 @@ export class PostController {
   }
 
   @Get()
-  findAll(@CurrentUser() currentUser: IUserPayload) {
-    return this.postService.findAll(currentUser);
+  findAll(
+    @CurrentUser() currentUser: IUserPayload,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+    @Query('cursor') cursor: string,
+  ) {
+    return this.postService.findAll(currentUser, limit, cursor);
   }
 
   @Get(':id')

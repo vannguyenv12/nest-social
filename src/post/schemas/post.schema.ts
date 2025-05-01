@@ -26,6 +26,9 @@ export class Post {
   reactionsCount: Map<IReactionType, number>;
   @Prop({ enum: ['public', 'private', 'friends'], default: 'public' })
   privacy: IPrivacy;
+
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export const PostSchema = SchemaFactory.createForClass(Post);
