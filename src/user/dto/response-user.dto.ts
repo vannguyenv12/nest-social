@@ -1,4 +1,4 @@
-import { Expose } from 'class-transformer';
+import { Expose, Transform } from 'class-transformer';
 import { ObjectId } from 'src/_cores/decorators/object-id.decorator';
 
 export class ResponseUserDto {
@@ -17,6 +17,12 @@ export class ResponseUserDto {
   birthdate: Date;
   @Expose()
   phoneNumber: string;
+  @Expose()
+  @Transform(
+    ({ obj }) =>
+      `https://res.cloudinary.com/${process.env.CLOUDINARY_NAME}/image/upload/v${obj?.avatar?.version}/${obj?.avatar?.display_name}.${obj?.avatar?.format}`,
+  )
+  avatarUrl: string;
   @Expose()
   isActive: boolean;
 }

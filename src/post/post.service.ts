@@ -4,7 +4,7 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Post } from './schemas/post.schema';
 import { Model } from 'mongoose';
-import { UploadMediaDto } from './dto/upload-media.dto';
+import { UploadMediaDto } from 'src/_cores/globals/dtos';
 import { DeleteMediaDto } from './dto/delete-media.dto';
 import { AddReactionDto } from './dto/add-reaction.dto';
 import { ReactionService } from 'src/reaction/reaction.service';

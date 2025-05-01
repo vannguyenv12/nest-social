@@ -3,6 +3,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './schemas/user.schema';
 import { Model } from 'mongoose';
+import { UploadMediaDto } from 'src/_cores/globals/dtos';
 
 @Injectable()
 export class UserService {
@@ -51,5 +52,16 @@ export class UserService {
       { new: true },
     );
     if (!user) throw new NotFoundException('User not found');
+  }
+
+  async uploadAvatar(
+    uploadMediaDto: UploadMediaDto,
+    currentUser: IUserPayload,
+  ) {
+    const user = await this.userModel.findById(currentUser._id);
+    if (!user) throw new NotFoundException('User not found');
+
+    user.avatar = uploadMediaDto;
+    return user.save();
   }
 }

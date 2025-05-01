@@ -6,6 +6,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Post,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -17,6 +18,7 @@ import { ResponseUserDto } from './dto/response-user.dto';
 import { RoleGuard } from 'src/_cores/guards/role.guard';
 import { Roles } from 'src/_cores/decorators/role.decorator';
 import { ParseObjectIdPipe } from 'src/_cores/pipes/parse-object-id.pipe';
+import { UploadMediaDto } from 'src/_cores/globals/dtos';
 
 @Controller('users')
 @UseGuards(AuthGuard, RoleGuard)
@@ -29,8 +31,15 @@ export class UserController {
     return this.userService.getCurrentUser(currentUser);
   }
 
+  @Post('/upload-avatar')
+  uploadAvatar(
+    @Body() uploadMediaDto: UploadMediaDto,
+    @CurrentUser() currentUser: IUserPayload,
+  ) {
+    return this.userService.uploadAvatar(uploadMediaDto, currentUser);
+  }
+
   @Get()
-  // @Roles('admin')
   findAll() {
     return this.userService.findAll();
   }
