@@ -100,5 +100,9 @@ export class CommentService {
   async remove(id: string) {
     const comment = await this.commentModel.findByIdAndDelete(id);
     if (!comment) throw new NotFoundException('Comment not found');
+
+    if (!comment.parent) {
+      await this.commentModel.deleteMany({ parent: comment._id });
+    }
   }
 }
