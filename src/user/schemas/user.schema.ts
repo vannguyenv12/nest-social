@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
+import { MediaType } from 'src/_cores/globals/class';
 
 export type UserDocument = HydratedDocument<User>;
 
@@ -13,6 +14,17 @@ export class User {
   password: string;
   @Prop({ default: 'user' })
   role: IRole;
+
+  @Prop()
+  bio?: string;
+  @Prop()
+  avatar?: MediaType;
+  @Prop()
+  coverPhoto?: MediaType;
+  @Prop()
+  birthdate?: Date;
+  @Prop()
+  phoneNumber?: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

@@ -1,7 +1,6 @@
 import {
   Controller,
   Get,
-  Post,
   Body,
   Patch,
   Param,
@@ -9,7 +8,6 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthGuard } from 'src/_cores/guards/auth.guard';
 import { Request } from 'express';
@@ -18,6 +16,7 @@ import { TransformDTO } from 'src/_cores/interceptors/transform-dto.interceptor'
 import { ResponseUserDto } from './dto/response-user.dto';
 import { RoleGuard } from 'src/_cores/guards/role.guard';
 import { Roles } from 'src/_cores/decorators/role.decorator';
+import { ParseObjectIdPipe } from 'src/_cores/pipes/parse-object-id.pipe';
 
 @Controller('users')
 @UseGuards(AuthGuard, RoleGuard)
@@ -27,13 +26,7 @@ export class UserController {
 
   @Get('/profile')
   getCurrentUser(@CurrentUser() currentUser: IUserPayload) {
-    return currentUser;
-  }
-
-  @Post()
-  @Roles('admin')
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
+    return this.userService.getCurrentUser(currentUser);
   }
 
   @Get()
@@ -50,8 +43,11 @@ export class UserController {
 
   @Patch(':id')
   @Roles('admin', 'user')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
+  update(
+    @Param('id', ParseObjectIdPipe) id: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
+    return this.userService.update(id, updateUserDto);
   }
 
   @Delete(':id')

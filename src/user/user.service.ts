@@ -17,14 +17,31 @@ export class UserService {
     return `This action returns all user`;
   }
 
+  async getCurrentUser(currentUser: IUserPayload) {
+    const user = await this.userModel.findById(currentUser._id);
+    if (!user) throw new NotFoundException('User not found');
+
+    return user;
+  }
+
   async findOne(id: string) {
     const user = await this.userModel.findById(id);
     if (!user) throw new NotFoundException('User does not exist');
     return user;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: string, updateUserDto: UpdateUserDto) {
+    const user = await this.userModel.findByIdAndUpdate(
+      id,
+      {
+        ...updateUserDto,
+      },
+      { new: true },
+    );
+
+    if (!user) throw new NotFoundException('User not found');
+
+    return user;
   }
 
   remove(id: number) {
