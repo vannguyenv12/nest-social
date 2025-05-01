@@ -51,6 +51,32 @@ export class CommentService {
     return comment.save();
   }
 
+  async getComments(postId: string) {
+    const comments = await this.commentModel
+      .find({ post: postId })
+      .populate('userComment')
+      .populate('replyToUser')
+      .lean();
+
+    const finalResult: any[] = [];
+
+    for (const comment of comments) {
+      if (!comment.parent) {
+        finalResult.push({ ...comment, replies: [] });
+      } else {
+        const foundRootComment = finalResult.find(
+          (c) => c._id.toString() === comment.parent?._id.toString(),
+        );
+
+        if (foundRootComment) {
+          foundRootComment.replies.push(comment);
+        }
+      }
+    }
+
+    return finalResult;
+  }
+
   findAll() {
     return `This action returns all comment`;
   }

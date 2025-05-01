@@ -13,6 +13,7 @@ import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { CurrentUser } from 'src/_cores/decorators/current-user.decorator';
 import { AuthGuard } from 'src/_cores/guards/auth.guard';
+import { ParseObjectIdPipe } from 'src/_cores/pipes/parse-object-id.pipe';
 
 @Controller('comments')
 @UseGuards(AuthGuard)
@@ -30,6 +31,11 @@ export class CommentController {
   @Get()
   findAll() {
     return this.commentService.findAll();
+  }
+
+  @Get('/post/:postId')
+  getComments(@Param('postId', ParseObjectIdPipe) postId: string) {
+    return this.commentService.getComments(postId);
   }
 
   @Get(':id')
