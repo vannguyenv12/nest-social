@@ -140,6 +140,8 @@ export class PostService {
 
     post.reactionsCount = reactionCounts;
     await post.save();
+
+    // TODO: EMIT EVENT
   }
 
   async removeReaction(
@@ -161,5 +163,7 @@ export class PostService {
     await this.postModel.findByIdAndUpdate(post._id, {
       $inc: { [`reactionsCount.${existingReaction.type}`]: -1 },
     });
+
+    // TODO: EMIT EVENT
   }
 }
