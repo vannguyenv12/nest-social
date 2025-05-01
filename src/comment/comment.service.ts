@@ -1,11 +1,53 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { Comment } from './schemas/comment.schema';
+import { Model, Types } from 'mongoose';
+import { PostService } from 'src/post/post.service';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class CommentService {
-  create(createCommentDto: CreateCommentDto) {
-    return 'This action adds a new comment';
+  constructor(
+    @InjectModel(Comment.name) private commentModel: Model<Comment>,
+    private postService: PostService,
+    private userService: UserService,
+  ) {}
+
+  async create(createCommentDto: CreateCommentDto) {
+    const { postId, content, parentCommentId, replyToUserId } =
+      createCommentDto;
+    const post = await this.postService.findOne(postId);
+
+    let realParentCommentId: Types.ObjectId | null = null;
+    let realReplyToUserId: Types.ObjectId | null = null;
+
+    if (replyToUserId) {
+      const replyToUser = await this.userService.findOne(replyToUserId);
+      realReplyToUserId = replyToUser._id;
+    }
+
+    if (parentCommentId) {
+      const parentComment = await this.commentModel.findById(parentCommentId);
+
+      if (!parentComment) {
+        throw new NotFoundException('Parent comment does not exist');
+      }
+
+      realParentCommentId = parentComment.parent?._id
+        ? parentComment.parent?._id
+        : parentComment._id;
+    }
+
+    const comment = new this.commentModel({
+      content,
+      post,
+      parent: realParentCommentId,
+      replyToUser: realReplyToUserId,
+    });
+
+    return comment.save();
   }
 
   findAll() {
