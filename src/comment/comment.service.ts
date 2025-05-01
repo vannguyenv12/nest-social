@@ -85,8 +85,16 @@ export class CommentService {
     return `This action returns a #${id} comment`;
   }
 
-  update(id: number, updateCommentDto: UpdateCommentDto) {
-    return `This action updates a #${id} comment`;
+  async update(id: string, updateCommentDto: UpdateCommentDto) {
+    const comment = await this.commentModel.findByIdAndUpdate(
+      id,
+      { content: updateCommentDto.content },
+      { new: true },
+    );
+
+    if (!comment) throw new Error('Comment not found');
+
+    return comment;
   }
 
   remove(id: number) {
