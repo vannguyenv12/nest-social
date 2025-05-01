@@ -3,6 +3,7 @@ interface IUserPayload {
   name: string;
   email: string;
   role: string;
+  isActive: boolean;
 }
 
 type IRole = 'user' | 'admin';

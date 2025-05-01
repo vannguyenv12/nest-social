@@ -11,4 +11,6 @@ export class ResponseAuthDto {
   email: string;
   @Expose()
   role: string;
+  @Expose()
+  isActive: boolean;
 }

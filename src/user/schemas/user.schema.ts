@@ -25,6 +25,9 @@ export class User {
   birthdate?: Date;
   @Prop()
   phoneNumber?: string;
+
+  @Prop({ default: true })
+  isActive: boolean;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

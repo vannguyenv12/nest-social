@@ -17,4 +17,6 @@ export class ResponseUserDto {
   birthdate: Date;
   @Expose()
   phoneNumber: string;
+  @Expose()
+  isActive: boolean;
 }

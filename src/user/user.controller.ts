@@ -30,14 +30,13 @@ export class UserController {
   }
 
   @Get()
-  @Roles('admin')
+  // @Roles('admin')
   findAll() {
     return this.userService.findAll();
   }
 
   @Get(':id')
-  @Roles('admin', 'user')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', ParseObjectIdPipe) id: string) {
     return this.userService.findOne(id);
   }
 
@@ -51,7 +50,7 @@ export class UserController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userService.remove(+id);
+  async remove(@Param('id', ParseObjectIdPipe) id: string) {
+    return this.userService.remove(id);
   }
 }

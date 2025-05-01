@@ -41,6 +41,7 @@ export class AuthService {
       name: savedUser.name,
       email: savedUser.email,
       role: savedUser.role,
+      isActive: savedUser.isActive,
     };
     const accessToken = await this.jwtService.signAsync(payload);
 
@@ -54,6 +55,11 @@ export class AuthService {
     if (!user) {
       throw new NotFoundException('Bad Credentials');
     }
+
+    if (!user.isActive) {
+      throw new BadRequestException('Your account has no longer active');
+    }
+
     // 2) Check for password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
@@ -66,6 +72,7 @@ export class AuthService {
       name: user.name,
       email: user.email,
       role: user.role,
+      isActive: user.isActive,
     };
     const accessToken = await this.jwtService.signAsync(payload);
 
