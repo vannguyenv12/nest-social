@@ -24,5 +24,11 @@ export class ResponseUserDto {
   )
   avatarUrl: string;
   @Expose()
+  @Transform(
+    ({ obj }) =>
+      `https://res.cloudinary.com/${process.env.CLOUDINARY_NAME}/image/upload/v${obj?.coverPhoto?.version}/${obj?.coverPhoto?.display_name}.${obj?.coverPhoto?.format}`,
+  )
+  coverPhotoUrl: string;
+  @Expose()
   isActive: boolean;
 }

@@ -39,6 +39,14 @@ export class UserController {
     return this.userService.uploadAvatar(uploadMediaDto, currentUser);
   }
 
+  @Post('/upload-cover')
+  uploadCoverPhoto(
+    @Body() uploadMediaDto: UploadMediaDto,
+    @CurrentUser() currentUser: IUserPayload,
+  ) {
+    return this.userService.uploadCoverPhoto(uploadMediaDto, currentUser);
+  }
+
   @Get()
   findAll() {
     return this.userService.findAll();

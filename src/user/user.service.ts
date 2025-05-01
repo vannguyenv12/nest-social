@@ -64,4 +64,15 @@ export class UserService {
     user.avatar = uploadMediaDto;
     return user.save();
   }
+
+  async uploadCoverPhoto(
+    uploadMediaDto: UploadMediaDto,
+    currentUser: IUserPayload,
+  ) {
+    const user = await this.userModel.findById(currentUser._id);
+    if (!user) throw new NotFoundException('User not found');
+
+    user.coverPhoto = uploadMediaDto;
+    return user.save();
+  }
 }
