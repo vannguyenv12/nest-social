@@ -49,6 +49,8 @@ export class CommentService {
     });
 
     return comment.save();
+
+    // TODO: EMIT EVENT
   }
 
   async getComments(postId: string) {
@@ -95,6 +97,8 @@ export class CommentService {
     if (!comment) throw new NotFoundException('Comment not found');
 
     return comment;
+
+    // TODO: EMIT EVENT
   }
 
   async remove(id: string) {
@@ -104,5 +108,7 @@ export class CommentService {
     if (!comment.parent) {
       await this.commentModel.deleteMany({ parent: comment._id });
     }
+
+    // TODO: EMIT EVENT
   }
 }
