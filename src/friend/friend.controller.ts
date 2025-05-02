@@ -5,8 +5,8 @@ import {
   Body,
   Patch,
   Param,
-  Delete,
   UseGuards,
+  HttpCode,
 } from '@nestjs/common';
 import { FriendService } from './friend.service';
 import { UpdateFriendDto } from './dto/update-friend.dto';
@@ -19,12 +19,22 @@ import { AuthGuard } from 'src/_cores/guards/auth.guard';
 export class FriendController {
   constructor(private readonly friendService: FriendService) {}
 
+  @HttpCode(200)
   @Post('/request/:receiverId')
   sendFriendRequest(
     @CurrentUser() currentUser: IUserPayload,
     @Param('receiverId', ParseObjectIdPipe) receiverId: string,
   ) {
     return this.friendService.create(currentUser, receiverId);
+  }
+
+  @HttpCode(200)
+  @Post('/cancel-request/:receiverId')
+  cancelFriendRequest(
+    @CurrentUser() currentUser: IUserPayload,
+    @Param('receiverId', ParseObjectIdPipe) receiverId: string,
+  ) {
+    return this.friendService.remove(currentUser, receiverId);
   }
 
   @Get()
@@ -40,10 +50,5 @@ export class FriendController {
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateFriendDto: UpdateFriendDto) {
     return this.friendService.update(+id, updateFriendDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.friendService.remove(+id);
   }
 }

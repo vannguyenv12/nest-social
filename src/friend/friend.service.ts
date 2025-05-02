@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateFriendDto } from './dto/create-friend.dto';
 import { UpdateFriendDto } from './dto/update-friend.dto';
 import { CurrentUser } from 'src/_cores/decorators/current-user.decorator';
@@ -53,7 +57,18 @@ export class FriendService {
     return `This action updates a #${id} friend`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} friend`;
+  async remove(@CurrentUser() currentUser: IUserPayload, receiverId: string) {
+    const receiver = await this.userService.findOne(receiverId);
+
+    const friendRequest = await this.friendRequestModel.findOne({
+      sender: currentUser._id,
+      receiver: receiver._id,
+      status: 'pending',
+    });
+
+    if (!friendRequest)
+      throw new NotFoundException('Friend request does not exist');
+
+    await friendRequest.deleteOne();
   }
 }
