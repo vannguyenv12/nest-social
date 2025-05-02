@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import mongoose, { HydratedDocument } from 'mongoose';
 import { MediaType } from 'src/_cores/globals/class';
 
 export type UserDocument = HydratedDocument<User>;
@@ -26,8 +26,13 @@ export class User {
   @Prop()
   phoneNumber?: string;
 
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
+  friends: UserDocument[];
+
   @Prop({ default: true })
   isActive: boolean;
 }
+
+// A => friends = []
 
 export const UserSchema = SchemaFactory.createForClass(User);
