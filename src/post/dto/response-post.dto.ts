@@ -6,9 +6,10 @@ import { PostDocument } from '../schemas/post.schema';
 
 export class MediaType {
   @Expose()
-  @Transform(
-    ({ obj }) =>
-      `https://res.cloudinary.com/${process.env.CLOUDINARY_NAME}/image/upload/v${obj.version}/${obj.display_name}.${obj.format}`,
+  @Transform(({ obj }) =>
+    obj?.public_id
+      ? `https://res.cloudinary.com/${process.env.CLOUDINARY_NAME}/image/upload/v${obj.version}/${obj.display_name}.${obj.format}`
+      : null,
   )
   url: string;
   @Expose()

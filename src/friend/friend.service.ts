@@ -4,8 +4,6 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateFriendDto } from './dto/create-friend.dto';
-import { UpdateFriendDto } from './dto/update-friend.dto';
 import { CurrentUser } from 'src/_cores/decorators/current-user.decorator';
 import { InjectModel } from '@nestjs/mongoose';
 import { FriendRequest } from './schemas/friend-request.schemas';
@@ -114,18 +112,6 @@ export class FriendService {
 
   getCurrentFriends(currentUser: IUserPayload) {
     return this.userService.getFriends(currentUser._id);
-  }
-
-  findAll() {
-    return `This action returns all friend`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} friend`;
-  }
-
-  update(id: number, updateFriendDto: UpdateFriendDto) {
-    return `This action updates a #${id} friend`;
   }
 
   async remove(@CurrentUser() currentUser: IUserPayload, receiverId: string) {

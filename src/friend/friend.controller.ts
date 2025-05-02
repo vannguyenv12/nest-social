@@ -1,21 +1,21 @@
 import {
   Controller,
   Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  UseGuards,
   HttpCode,
+  Param,
+  Post,
+  UseGuards,
 } from '@nestjs/common';
-import { FriendService } from './friend.service';
-import { UpdateFriendDto } from './dto/update-friend.dto';
 import { CurrentUser } from 'src/_cores/decorators/current-user.decorator';
-import { ParseObjectIdPipe } from 'src/_cores/pipes/parse-object-id.pipe';
 import { AuthGuard } from 'src/_cores/guards/auth.guard';
+import { ParseObjectIdPipe } from 'src/_cores/pipes/parse-object-id.pipe';
+import { FriendService } from './friend.service';
+import { TransformDTO } from 'src/_cores/interceptors/transform-dto.interceptor';
+import { ResponseFriendDto } from './dto/response-friend.dto';
 
 @Controller('friends')
 @UseGuards(AuthGuard)
+@TransformDTO(ResponseFriendDto)
 export class FriendController {
   constructor(private readonly friendService: FriendService) {}
 
@@ -63,15 +63,5 @@ export class FriendController {
   @Get('/request-pending')
   getCurrentRequestPending(@CurrentUser() currentUser: IUserPayload) {
     return this.friendService.getCurrentRequestPending(currentUser);
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.friendService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateFriendDto: UpdateFriendDto) {
-    return this.friendService.update(+id, updateFriendDto);
   }
 }
