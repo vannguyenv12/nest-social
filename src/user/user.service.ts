@@ -75,4 +75,10 @@ export class UserService {
     user.coverPhoto = uploadMediaDto;
     return user.save();
   }
+
+  async addFriend(userId: string, friendId: string) {
+    return this.userModel.findByIdAndUpdate(userId, {
+      $addToSet: { friends: friendId },
+    });
+  }
 }

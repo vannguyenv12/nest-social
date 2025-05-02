@@ -37,6 +37,15 @@ export class FriendController {
     return this.friendService.remove(currentUser, receiverId);
   }
 
+  @HttpCode(200)
+  @Post('/accept-request/:friendRequestId')
+  acceptFriendRequest(
+    @CurrentUser() currentUser: IUserPayload,
+    @Param('friendRequestId', ParseObjectIdPipe) friendRequestId: string,
+  ) {
+    return this.friendService.acceptFriendRequest(currentUser, friendRequestId);
+  }
+
   @Get()
   findAll() {
     return this.friendService.findAll();

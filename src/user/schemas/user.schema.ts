@@ -26,7 +26,7 @@ export class User {
   @Prop()
   phoneNumber?: string;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', default: [] })
   friends: UserDocument[];
 
   @Prop({ default: true })

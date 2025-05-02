@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -43,6 +44,39 @@ export class FriendService {
     });
 
     return friendRequest.save();
+  }
+
+  async acceptFriendRequest(
+    @CurrentUser() currentUser: IUserPayload,
+    friendRequestId: string,
+  ) {
+    const friendRequest =
+      await this.friendRequestModel.findById(friendRequestId);
+
+    if (!friendRequest) {
+      throw new NotFoundException('Friend request not found');
+    }
+
+    if (friendRequest.status !== 'pending') {
+      throw new BadRequestException('Request already handled');
+    }
+
+    if (currentUser._id !== friendRequest.receiver._id.toString()) {
+      throw new ForbiddenException();
+    }
+
+    friendRequest.status = 'accept';
+    await friendRequest.save();
+
+    await this.userService.addFriend(
+      friendRequest.sender._id.toString(),
+      friendRequest.receiver._id.toString(),
+    );
+
+    await this.userService.addFriend(
+      friendRequest.receiver._id.toString(),
+      friendRequest.sender._id.toString(),
+    );
   }
 
   findAll() {
