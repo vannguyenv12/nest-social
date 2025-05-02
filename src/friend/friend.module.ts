@@ -6,12 +6,14 @@ import {
   FriendRequest,
   FriendRequestSchema,
 } from './schemas/friend-request.schemas';
+import { UserModule } from 'src/user/user.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: FriendRequest.name, schema: FriendRequestSchema },
     ]),
+    UserModule,
   ],
   controllers: [FriendController],
   providers: [FriendService],
