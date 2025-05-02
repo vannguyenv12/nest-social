@@ -112,6 +112,10 @@ export class FriendService {
       .populate('receiver', 'name email avatar');
   }
 
+  getCurrentFriends(currentUser: IUserPayload) {
+    return this.userService.getFriends(currentUser._id);
+  }
+
   findAll() {
     return `This action returns all friend`;
   }

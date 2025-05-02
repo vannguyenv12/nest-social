@@ -81,4 +81,11 @@ export class UserService {
       $addToSet: { friends: friendId },
     });
   }
+
+  async getFriends(userId: string) {
+    const user = await this.userModel.findById(userId).populate('friends');
+
+    if (!user) throw new NotFoundException('User not found');
+    return user.friends;
+  }
 }
