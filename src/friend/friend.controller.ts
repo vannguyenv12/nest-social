@@ -55,9 +55,9 @@ export class FriendController {
     return this.friendService.rejectFriendRequest(currentUser, friendRequestId);
   }
 
-  @Get()
-  findAll() {
-    return this.friendService.findAll();
+  @Get('/request-pending')
+  getCurrentRequestPending(@CurrentUser() currentUser: IUserPayload) {
+    return this.friendService.getCurrentRequestPending(currentUser);
   }
 
   @Get(':id')

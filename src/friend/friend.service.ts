@@ -102,6 +102,16 @@ export class FriendService {
     await friendRequest.save();
   }
 
+  getCurrentRequestPending(currentUser: IUserPayload) {
+    return this.friendRequestModel
+      .find({
+        receiver: currentUser._id,
+        status: 'pending',
+      })
+      .populate('sender', 'name email avatar')
+      .populate('receiver', 'name email avatar');
+  }
+
   findAll() {
     return `This action returns all friend`;
   }
