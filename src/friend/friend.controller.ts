@@ -46,6 +46,15 @@ export class FriendController {
     return this.friendService.acceptFriendRequest(currentUser, friendRequestId);
   }
 
+  @HttpCode(200)
+  @Post('/reject-request/:friendRequestId')
+  rejectFriendRequest(
+    @CurrentUser() currentUser: IUserPayload,
+    @Param('friendRequestId', ParseObjectIdPipe) friendRequestId: string,
+  ) {
+    return this.friendService.rejectFriendRequest(currentUser, friendRequestId);
+  }
+
   @Get()
   findAll() {
     return this.friendService.findAll();

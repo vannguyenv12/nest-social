@@ -31,7 +31,7 @@ export class FriendService {
     const existingFriendRequest = await this.friendRequestModel.findOne({
       sender: currentUser._id,
       receiver: receiver._id,
-      status: 'pending',
+      status: { $in: ['pending', 'accept'] },
     });
 
     if (existingFriendRequest)
@@ -77,6 +77,29 @@ export class FriendService {
       friendRequest.receiver._id.toString(),
       friendRequest.sender._id.toString(),
     );
+  }
+
+  async rejectFriendRequest(
+    @CurrentUser() currentUser: IUserPayload,
+    friendRequestId: string,
+  ) {
+    const friendRequest =
+      await this.friendRequestModel.findById(friendRequestId);
+
+    if (!friendRequest) {
+      throw new NotFoundException('Friend request not found');
+    }
+
+    if (friendRequest.status !== 'pending') {
+      throw new BadRequestException('Request already handled');
+    }
+
+    if (currentUser._id !== friendRequest.receiver._id.toString()) {
+      throw new ForbiddenException();
+    }
+
+    friendRequest.status = 'reject';
+    await friendRequest.save();
   }
 
   findAll() {
