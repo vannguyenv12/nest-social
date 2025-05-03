@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateGroupConversationDto } from './dto/create-conversation.dto';
 import { UpdateConversationDto } from './dto/update-conversation.dto';
 import { CreatePrivateConversationDto } from './dto/create-private-conversation.dto';
@@ -52,12 +52,41 @@ export class ConversationService {
     return conversation.save();
   }
 
-  findAll() {
-    return `This action returns all conversation`;
+  async findAll(currentUser: IUserPayload, limit: number, cursor: string) {
+    const query: Record<string, any> = {
+      participants: { $in: [currentUser._id] },
+    };
+
+    if (cursor) {
+      query.updatedAt = { $lt: new Date(cursor) };
+    }
+
+    const conversations = await this.conversationModel
+      .find(query)
+      .populate('lastMessage')
+      .sort({ updatedAt: -1 })
+      .limit(limit + 1)
+      .populate('groupOwner', 'email name')
+      .lean();
+
+    const hasNextPage = conversations.length > limit;
+    const items = hasNextPage ? conversations.slice(0, 1) : conversations;
+
+    return {
+      items,
+      hasNextPage,
+      cursor: hasNextPage ? items[items.length - 1].updatedAt : null,
+    };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} conversation`;
+  async findOne(id: string) {
+    const conversation = await this.conversationModel
+      .findById(id)
+      .populate('participants');
+
+    if (!conversation) throw new NotFoundException('Conversation not found');
+
+    return conversation;
   }
 
   update(id: number, updateConversationDto: UpdateConversationDto) {

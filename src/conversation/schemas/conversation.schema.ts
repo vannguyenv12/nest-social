@@ -23,6 +23,9 @@ export class Conversation {
   groupName?: string;
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Message' })
   lastMessage?: MessageDocument;
+
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export const ConversationSchema = SchemaFactory.createForClass(Conversation);
