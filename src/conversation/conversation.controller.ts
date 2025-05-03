@@ -65,10 +65,15 @@ export class ConversationController {
 
   @Patch(':id')
   update(
-    @Param('id') id: string,
+    @Param('id', ParseObjectIdPipe) id: string,
     @Body() updateConversationDto: UpdateConversationDto,
+    @CurrentUser() currentUser: IUserPayload,
   ) {
-    return this.conversationService.update(+id, updateConversationDto);
+    return this.conversationService.update(
+      id,
+      updateConversationDto,
+      currentUser,
+    );
   }
 
   @Delete(':id')

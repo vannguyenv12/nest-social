@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateGroupConversationDto } from './dto/create-conversation.dto';
 import { UpdateConversationDto } from './dto/update-conversation.dto';
 import { CreatePrivateConversationDto } from './dto/create-private-conversation.dto';
@@ -89,8 +93,22 @@ export class ConversationService {
     return conversation;
   }
 
-  update(id: number, updateConversationDto: UpdateConversationDto) {
-    return `This action updates a #${id} conversation`;
+  async update(
+    id: string,
+    updateConversationDto: UpdateConversationDto,
+    currentUser: IUserPayload,
+  ) {
+    const { groupName, groupAvatar } = updateConversationDto;
+
+    const conversation = await this.conversationModel.findById(id);
+    if (!conversation) throw new NotFoundException('Conversation not found');
+    if (currentUser._id !== conversation.groupOwner?._id.toString()) {
+      throw new ForbiddenException();
+    }
+
+    conversation.groupAvatar = groupAvatar || conversation.groupAvatar;
+    conversation.groupName = groupName || conversation.groupName;
+    await conversation.save();
   }
 
   remove(id: number) {
