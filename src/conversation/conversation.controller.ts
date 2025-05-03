@@ -1,11 +1,35 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+} from '@nestjs/common';
 import { ConversationService } from './conversation.service';
 import { CreateConversationDto } from './dto/create-conversation.dto';
 import { UpdateConversationDto } from './dto/update-conversation.dto';
+import { CurrentUser } from 'src/_cores/decorators/current-user.decorator';
+import { CreatePrivateConversationDto } from './dto/create-private-conversation.dto';
+import { AuthGuard } from 'src/_cores/guards/auth.guard';
 
-@Controller('conversation')
+@Controller('conversations')
+@UseGuards(AuthGuard)
 export class ConversationController {
   constructor(private readonly conversationService: ConversationService) {}
+
+  @Post('/private')
+  createPrivate(
+    @Body() createPrivateConversationDto: CreatePrivateConversationDto,
+    @CurrentUser() currentUser: IUserPayload,
+  ) {
+    return this.conversationService.createPrivate(
+      createPrivateConversationDto,
+      currentUser,
+    );
+  }
 
   @Post()
   create(@Body() createConversationDto: CreateConversationDto) {
@@ -23,7 +47,10 @@ export class ConversationController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateConversationDto: UpdateConversationDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateConversationDto: UpdateConversationDto,
+  ) {
     return this.conversationService.update(+id, updateConversationDto);
   }
 

@@ -14,11 +14,14 @@ export class Conversation {
   @Prop({ default: false })
   isGroup: boolean;
 
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
+  groupOwner?: UserDocument;
+
   @Prop()
   groupAvatar?: MediaType;
   @Prop()
   groupName?: string;
-  @Prop()
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Message' })
   lastMessage?: MessageDocument;
 }
 
