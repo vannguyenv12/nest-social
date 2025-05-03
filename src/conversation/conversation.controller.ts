@@ -20,6 +20,7 @@ import { UpdateConversationDto } from './dto/update-conversation.dto';
 import { TransformDTO } from 'src/_cores/interceptors/transform-dto.interceptor';
 import { ResponseConversationDto } from './dto/response-conversation.dto';
 import { ParseObjectIdPipe } from 'src/_cores/pipes/parse-object-id.pipe';
+import { AddParticipantsDto } from './dto/add-participants.dto';
 
 @Controller('conversations')
 @UseGuards(AuthGuard)
@@ -72,6 +73,19 @@ export class ConversationController {
     return this.conversationService.update(
       id,
       updateConversationDto,
+      currentUser,
+    );
+  }
+
+  @Patch(':id/add-members')
+  addParticipants(
+    @Param('id', ParseObjectIdPipe) id: string,
+    @Body() addParticipantDto: AddParticipantsDto,
+    @CurrentUser() currentUser: IUserPayload,
+  ) {
+    return this.conversationService.addParticipants(
+      id,
+      addParticipantDto,
       currentUser,
     );
   }

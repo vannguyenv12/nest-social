@@ -9,12 +9,16 @@ import { CreatePrivateConversationDto } from './dto/create-private-conversation.
 import { InjectModel } from '@nestjs/mongoose';
 import { Conversation } from './schemas/conversation.schema';
 import { Model } from 'mongoose';
+import { AddParticipantsDto } from './dto/add-participants.dto';
+import { UserService } from 'src/user/user.service';
+import { UserDocument } from 'src/user/schemas/user.schema';
 
 @Injectable()
 export class ConversationService {
   constructor(
     @InjectModel(Conversation.name)
     private conversationModel: Model<Conversation>,
+    private userService: UserService,
   ) {}
 
   async createPrivate(
@@ -108,6 +112,40 @@ export class ConversationService {
 
     conversation.groupAvatar = groupAvatar || conversation.groupAvatar;
     conversation.groupName = groupName || conversation.groupName;
+    await conversation.save();
+  }
+
+  async addParticipants(
+    id: string,
+    addParticipantsDto: AddParticipantsDto,
+    currentUser: IUserPayload,
+  ) {
+    const { participantIds } = addParticipantsDto;
+
+    const conversation = await this.conversationModel.findById(id);
+    if (!conversation || !conversation.isGroup) {
+      throw new NotFoundException('Conversation not found');
+    }
+
+    if (conversation.groupOwner?._id?.toString() !== currentUser._id) {
+      throw new ForbiddenException();
+    }
+
+    const existingParticipantIds = conversation.participants.map((p) =>
+      p._id.toString(),
+    );
+
+    const participants: UserDocument[] = [];
+
+    for (const participantId of participantIds) {
+      if (!existingParticipantIds.includes(participantId)) {
+        const user = await this.userService.findOne(participantId);
+        participants.push(user);
+      }
+    }
+
+    conversation.participants = [...conversation.participants, ...participants];
+
     await conversation.save();
   }
 
