@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreateConversationDto } from './dto/create-conversation.dto';
+import { CreateGroupConversationDto } from './dto/create-conversation.dto';
 import { UpdateConversationDto } from './dto/update-conversation.dto';
 import { CreatePrivateConversationDto } from './dto/create-private-conversation.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -34,8 +34,22 @@ export class ConversationService {
     return conversation.save();
   }
 
-  create(createConversationDto: CreateConversationDto) {
-    return 'This action adds a new conversation';
+  createGroup(
+    createGroupConversationDto: CreateGroupConversationDto,
+    currentUser: IUserPayload,
+  ) {
+    const { groupAvatar, groupName, participantIds } =
+      createGroupConversationDto;
+
+    const conversation = new this.conversationModel({
+      isGroup: true,
+      participants: [currentUser._id, ...participantIds],
+      groupName,
+      groupAvatar,
+      groupOwner: currentUser._id,
+    });
+
+    return conversation.save();
   }
 
   findAll() {

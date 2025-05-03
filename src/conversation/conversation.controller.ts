@@ -1,19 +1,19 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
   UseGuards,
 } from '@nestjs/common';
-import { ConversationService } from './conversation.service';
-import { CreateConversationDto } from './dto/create-conversation.dto';
-import { UpdateConversationDto } from './dto/update-conversation.dto';
 import { CurrentUser } from 'src/_cores/decorators/current-user.decorator';
-import { CreatePrivateConversationDto } from './dto/create-private-conversation.dto';
 import { AuthGuard } from 'src/_cores/guards/auth.guard';
+import { ConversationService } from './conversation.service';
+import { CreateGroupConversationDto } from './dto/create-conversation.dto';
+import { CreatePrivateConversationDto } from './dto/create-private-conversation.dto';
+import { UpdateConversationDto } from './dto/update-conversation.dto';
 
 @Controller('conversations')
 @UseGuards(AuthGuard)
@@ -31,9 +31,15 @@ export class ConversationController {
     );
   }
 
-  @Post()
-  create(@Body() createConversationDto: CreateConversationDto) {
-    return this.conversationService.create(createConversationDto);
+  @Post('/group')
+  createGroup(
+    @Body() createGroupConversationDto: CreateGroupConversationDto,
+    @CurrentUser() currentUser: IUserPayload,
+  ) {
+    return this.conversationService.createGroup(
+      createGroupConversationDto,
+      currentUser,
+    );
   }
 
   @Get()
