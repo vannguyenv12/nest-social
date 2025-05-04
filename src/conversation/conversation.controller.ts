@@ -90,6 +90,19 @@ export class ConversationController {
     );
   }
 
+  @Patch(':id/remove-members')
+  removeParticipants(
+    @Param('id', ParseObjectIdPipe) id: string,
+    @Body() removeParticipantDto: AddParticipantsDto,
+    @CurrentUser() currentUser: IUserPayload,
+  ) {
+    return this.conversationService.removeParticipants(
+      id,
+      removeParticipantDto,
+      currentUser,
+    );
+  }
+
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.conversationService.remove(+id);

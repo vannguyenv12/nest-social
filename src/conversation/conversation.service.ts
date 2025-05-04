@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -146,6 +147,34 @@ export class ConversationService {
 
     conversation.participants = [...conversation.participants, ...participants];
 
+    await conversation.save();
+  }
+
+  async removeParticipants(
+    id: string,
+    removeParticipantsDto: AddParticipantsDto,
+    currentUser: IUserPayload,
+  ) {
+    const { participantIds } = removeParticipantsDto;
+
+    const conversation = await this.conversationModel.findById(id);
+    if (!conversation || !conversation.isGroup) {
+      throw new NotFoundException('Conversation not found');
+    }
+
+    if (conversation.groupOwner?._id?.toString() !== currentUser._id) {
+      throw new ForbiddenException();
+    }
+
+    if (participantIds.includes(currentUser._id)) {
+      throw new BadRequestException('Cannot remove owner');
+    }
+
+    const filteredParticipants = conversation.participants.filter(
+      (p) => !participantIds.includes(p._id.toString()),
+    );
+
+    conversation.participants = filteredParticipants;
     await conversation.save();
   }
 
