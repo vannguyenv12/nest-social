@@ -14,16 +14,30 @@ export class MessageService {
     private conversationService: ConversationService,
   ) {}
 
-  async getAllMessages(conversationId: string) {
+  async getAllMessages(conversationId: string, limit: number, cursor: string) {
+    const query: Record<string, any> = {
+      conversation: conversationId,
+    };
+
+    if (cursor) {
+      query.createdAt = { $gt: new Date(cursor) };
+    }
+
     const messages = await this.messageModel
-      .find({
-        conversation: conversationId,
-      })
+      .find(query)
       .sort({ createdAt: 1 })
+      .limit(limit + 1)
       .populate('sender', 'name avatar')
       .populate('seenBy', 'name avatar');
 
-    return messages;
+    const hasNextPage = messages.length > limit;
+    const items = hasNextPage ? messages.slice(0, 1) : messages;
+
+    return {
+      items,
+      hasNextPage,
+      cursor: hasNextPage ? items[items.length - 1].createdAt : null,
+    };
   }
 
   async sendMessage(
