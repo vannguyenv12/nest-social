@@ -46,6 +46,16 @@ export class MessageService {
     };
   }
 
+  async findOne(id: string) {
+    const message = await this.messageModel.findOne({
+      _id: id,
+      isDelete: false,
+    });
+    if (!message) throw new NotFoundException('Message not found');
+
+    return message;
+  }
+
   async sendMessage(
     conversationId: string,
     sendMessageDto: SendMessageDto,
@@ -70,16 +80,6 @@ export class MessageService {
     );
 
     // TODO: Real time
-  }
-
-  async findOne(id: string) {
-    const message = await this.messageModel.findOne({
-      _id: id,
-      isDelete: false,
-    });
-    if (!message) throw new NotFoundException('Message not found');
-
-    return message;
   }
 
   async update(
