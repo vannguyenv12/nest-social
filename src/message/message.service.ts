@@ -70,12 +70,11 @@ export class MessageService {
     // TODO: Real time
   }
 
-  findAll() {
-    return `This action returns all message`;
-  }
-
   async findOne(id: string) {
-    const message = await this.messageModel.findById(id);
+    const message = await this.messageModel.findOne({
+      _id: id,
+      isDelete: false,
+    });
     if (!message) throw new NotFoundException('Message not found');
 
     return message;
@@ -100,7 +99,14 @@ export class MessageService {
     await message.save();
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} message`;
+  async remove(id: string, currentUser: IUserPayload) {
+    const message = await this.findOne(id);
+
+    if (message.sender._id.toString() !== currentUser._id) {
+      throw new ForbiddenException();
+    }
+
+    message.isDelete = true;
+    await message.save();
   }
 }

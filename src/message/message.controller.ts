@@ -63,7 +63,10 @@ export class MessageController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.messageService.remove(+id);
+  remove(
+    @Param('id', ParseObjectIdPipe) id: string,
+    @CurrentUser() currentUser: IUserPayload,
+  ) {
+    return this.messageService.remove(id, currentUser);
   }
 }
