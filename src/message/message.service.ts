@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { UpdateMessageDto } from './dto/update-message.dto';
 import { SendMessageDto } from './dto/send-message.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -70,12 +74,30 @@ export class MessageService {
     return `This action returns all message`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} message`;
+  async findOne(id: string) {
+    const message = await this.messageModel.findById(id);
+    if (!message) throw new NotFoundException('Message not found');
+
+    return message;
   }
 
-  update(id: number, updateMessageDto: UpdateMessageDto) {
-    return `This action updates a #${id} message`;
+  async update(
+    id: string,
+    updateMessageDto: UpdateMessageDto,
+    currentUser: IUserPayload,
+  ) {
+    const { text, mediaFiles } = updateMessageDto;
+
+    const message = await this.findOne(id);
+
+    if (message.sender._id.toString() !== currentUser._id) {
+      throw new ForbiddenException();
+    }
+
+    message.text = text || message.text;
+    message.mediaFiles = mediaFiles || message.mediaFiles;
+
+    await message.save();
   }
 
   remove(id: number) {

@@ -49,13 +49,17 @@ export class MessageController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.messageService.findOne(+id);
+  findOne(@Param('id', ParseObjectIdPipe) id: string) {
+    return this.messageService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateMessageDto: UpdateMessageDto) {
-    return this.messageService.update(+id, updateMessageDto);
+  update(
+    @Param('id', ParseObjectIdPipe) id: string,
+    @Body() updateMessageDto: UpdateMessageDto,
+    @CurrentUser() currentUser: IUserPayload,
+  ) {
+    return this.messageService.update(id, updateMessageDto, currentUser);
   }
 
   @Delete(':id')
