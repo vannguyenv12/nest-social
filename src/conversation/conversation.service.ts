@@ -178,7 +178,19 @@ export class ConversationService {
     await conversation.save();
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} conversation`;
+  async remove(id: string, currentUser: IUserPayload) {
+    const conversation = await this.conversationModel.findById(id);
+    if (!conversation) {
+      throw new NotFoundException('Conversation not found');
+    }
+
+    if (
+      conversation.isGroup &&
+      conversation.groupOwner?._id?.toString() !== currentUser._id
+    ) {
+      throw new ForbiddenException();
+    }
+
+    await conversation.deleteOne();
   }
 }

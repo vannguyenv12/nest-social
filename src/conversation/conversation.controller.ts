@@ -104,7 +104,10 @@ export class ConversationController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.conversationService.remove(+id);
+  remove(
+    @Param('id', ParseObjectIdPipe) id: string,
+    @CurrentUser() currentUser: IUserPayload,
+  ) {
+    return this.conversationService.remove(id, currentUser);
   }
 }
