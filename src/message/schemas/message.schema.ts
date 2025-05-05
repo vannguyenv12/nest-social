@@ -21,6 +21,9 @@ export class Message {
   isDelete: boolean;
   @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: 'User' })
   seenBy: UserDocument[];
+
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export const MessageSchema = SchemaFactory.createForClass(Message);

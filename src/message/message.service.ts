@@ -14,6 +14,18 @@ export class MessageService {
     private conversationService: ConversationService,
   ) {}
 
+  async getAllMessages(conversationId: string) {
+    const messages = await this.messageModel
+      .find({
+        conversation: conversationId,
+      })
+      .sort({ createdAt: 1 })
+      .populate('sender', 'name avatar')
+      .populate('seenBy', 'name avatar');
+
+    return messages;
+  }
+
   async sendMessage(
     conversationId: string,
     sendMessageDto: SendMessageDto,

@@ -14,8 +14,11 @@ import { SendMessageDto } from './dto/send-message.dto';
 import { ParseObjectIdPipe } from 'src/_cores/pipes/parse-object-id.pipe';
 import { CurrentUser } from 'src/_cores/decorators/current-user.decorator';
 import { AuthGuard } from 'src/_cores/guards/auth.guard';
+import { TransformDTO } from 'src/_cores/interceptors/transform-dto.interceptor';
+import { ResponseMessageDto } from './dto/response-message.dto';
 
 @Controller('messages')
+@TransformDTO(ResponseMessageDto)
 @UseGuards(AuthGuard)
 export class MessageController {
   constructor(private readonly messageService: MessageService) {}
@@ -33,9 +36,11 @@ export class MessageController {
     );
   }
 
-  @Get()
-  findAll() {
-    return this.messageService.findAll();
+  @Get('/conversation/:conversationId')
+  findAllMessage(
+    @Param('conversationId', ParseObjectIdPipe) conversationId: string,
+  ) {
+    return this.messageService.getAllMessages(conversationId);
   }
 
   @Get(':id')
