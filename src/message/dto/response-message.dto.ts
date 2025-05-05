@@ -40,7 +40,14 @@ export class ResponseMessageDto {
 
   @Expose()
   text: string;
-  @Transform(({ obj }) => console.log(obj?.mediaFiles))
+  @Expose()
+  @Transform(({ obj }) =>
+    obj?.mediaFiles?.map((file) =>
+      file?.public_id
+        ? `https://res.cloudinary.com/${process.env.CLOUDINARY_NAME}/image/upload/v${file?.version}/${file?.display_name}.${file?.format}`
+        : null,
+    ),
+  )
   mediaFiles: string[];
   @Expose()
   isDelete: string;

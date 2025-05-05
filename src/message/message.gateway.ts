@@ -8,6 +8,7 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { ResponseMessageDto } from './dto/response-message.dto';
 
 @WebSocketGateway({ cors: { origin: '*' } })
 export class MessageGateway
@@ -25,11 +26,17 @@ export class MessageGateway
     console.log(`Client disconnect ${client.id}`);
   }
 
-  @SubscribeMessage('events')
-  handleEvent(
-    @MessageBody() data: string, // FE
+  @SubscribeMessage('join_conversation')
+  async handleJoinConversation(
+    @MessageBody() conversationId: string, // FE
     @ConnectedSocket() client: Socket, // === socket
-  ): string {
-    return data;
+  ) {
+    await client.join(conversationId);
+  }
+
+  handleNewMessage(conversationId: string, data: ResponseMessageDto) {
+    console.log('check data from socket', data);
+
+    this.server.to(conversationId).emit('new_message', data);
   }
 }

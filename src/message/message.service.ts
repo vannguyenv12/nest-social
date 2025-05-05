@@ -10,6 +10,9 @@ import { Message } from './schemas/message.schema';
 import { Model } from 'mongoose';
 import { ConversationService } from 'src/conversation/conversation.service';
 import { UserService } from 'src/user/user.service';
+import { MessageGateway } from './message.gateway';
+import { plainToInstance } from 'class-transformer';
+import { ResponseMessageDto } from './dto/response-message.dto';
 
 @Injectable()
 export class MessageService {
@@ -18,6 +21,7 @@ export class MessageService {
     private messageModel: Model<Message>,
     private conversationService: ConversationService,
     private userService: UserService,
+    private messageGateway: MessageGateway,
   ) {}
 
   async getAllMessages(conversationId: string, limit: number, cursor: string) {
@@ -79,7 +83,18 @@ export class MessageService {
       savedMessage._id.toString(),
     );
 
+    const newMessage = await this.messageModel
+      .findById(savedMessage._id)
+      .populate('sender', 'name avatar')
+      .populate('seenBy', 'name avatar');
+
+    // convert savedMessage into ResponseMessageDto
+    const responseMessage = plainToInstance(ResponseMessageDto, newMessage, {
+      excludeExtraneousValues: true,
+    });
+
     // TODO: Real time
+    this.messageGateway.handleNewMessage(conversationId, responseMessage);
   }
 
   async update(
