@@ -9,6 +9,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Message } from './schemas/message.schema';
 import { Model } from 'mongoose';
 import { ConversationService } from 'src/conversation/conversation.service';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class MessageService {
@@ -16,6 +17,7 @@ export class MessageService {
     @InjectModel(Message.name)
     private messageModel: Model<Message>,
     private conversationService: ConversationService,
+    private userService: UserService,
   ) {}
 
   async getAllMessages(conversationId: string, limit: number, cursor: string) {
@@ -108,5 +110,19 @@ export class MessageService {
 
     message.isDelete = true;
     await message.save();
+  }
+
+  async markSeenMessage(id: string, currentUser: IUserPayload) {
+    const message = await this.findOne(id);
+
+    const alreadySeen = message.seenBy.some(
+      (u) => u._id.toString() === currentUser._id,
+    );
+
+    if (!alreadySeen) {
+      const user = await this.userService.findOne(currentUser._id);
+      message.seenBy.push(user);
+      await message.save();
+    }
   }
 }
