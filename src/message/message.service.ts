@@ -1,11 +1,43 @@
 import { Injectable } from '@nestjs/common';
-import { CreateMessageDto } from './dto/create-message.dto';
 import { UpdateMessageDto } from './dto/update-message.dto';
+import { SendMessageDto } from './dto/send-message.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { Message } from './schemas/message.schema';
+import { Model } from 'mongoose';
+import { ConversationService } from 'src/conversation/conversation.service';
 
 @Injectable()
 export class MessageService {
-  create(createMessageDto: CreateMessageDto) {
-    return 'This action adds a new message';
+  constructor(
+    @InjectModel(Message.name)
+    private messageModel: Model<Message>,
+    private conversationService: ConversationService,
+  ) {}
+
+  async sendMessage(
+    conversationId: string,
+    sendMessageDto: SendMessageDto,
+    currentUser: IUserPayload,
+  ) {
+    const { text, mediaFiles } = sendMessageDto;
+
+    const message = new this.messageModel({
+      conversation: conversationId,
+      sender: currentUser._id,
+      text,
+      mediaFiles,
+      seenBy: [currentUser._id],
+    });
+
+    const savedMessage = await message.save();
+
+    // Update last message in conversation
+    await this.conversationService.updateLastMessage(
+      conversationId,
+      savedMessage._id.toString(),
+    );
+
+    // TODO: Real time
   }
 
   findAll() {
