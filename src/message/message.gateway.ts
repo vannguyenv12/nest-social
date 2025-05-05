@@ -47,4 +47,8 @@ export class MessageGateway
 
     this.server.to(data.conversationId).emit('update_message', data);
   }
+
+  handleRemoveMessage(conversationId: string, messageId: string) {
+    this.server.to(conversationId).emit('remove_message', messageId);
+  }
 }
