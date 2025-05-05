@@ -114,6 +114,29 @@ export class MessageService {
     message.mediaFiles = mediaFiles || message.mediaFiles;
 
     await message.save();
+
+    // this.messageGateway.handleUpdateMessageV2({
+    //   _id: message._id,
+    //   conversationId: message.conversation._id,
+    //   text: message.text,
+    //   mediaFiles: message.mediaFiles,
+    // });
+
+    const newMessage = await this.messageModel
+      .findById(message._id)
+      .populate('sender', 'name avatar')
+      .populate('seenBy', 'name avatar');
+
+    // convert savedMessage into ResponseMessageDto
+    const responseMessage = plainToInstance(ResponseMessageDto, newMessage, {
+      excludeExtraneousValues: true,
+    });
+
+    // TODO: Real time
+    this.messageGateway.handleUpdateMessage(
+      message.conversation._id.toString(),
+      responseMessage,
+    );
   }
 
   async remove(id: string, currentUser: IUserPayload) {

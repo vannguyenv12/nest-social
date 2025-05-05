@@ -35,8 +35,16 @@ export class MessageGateway
   }
 
   handleNewMessage(conversationId: string, data: ResponseMessageDto) {
+    this.server.to(conversationId).emit('new_message', data);
+  }
+
+  handleUpdateMessage(conversationId: string, data: ResponseMessageDto) {
+    this.server.to(conversationId).emit('update_message', data);
+  }
+
+  handleUpdateMessageV2(data: any) {
     console.log('check data from socket', data);
 
-    this.server.to(conversationId).emit('new_message', data);
+    this.server.to(data.conversationId).emit('update_message', data);
   }
 }
