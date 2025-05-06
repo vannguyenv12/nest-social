@@ -39,6 +39,16 @@ export class FriendGateway {
 
     this.server.to(senderId).emit('reject_friend_request', friendRequestId);
   }
+
+  handleCancelRequest(
+    receiverId: string,
+    senderId: string,
+    friendRequestId: string,
+  ) {
+    this.server
+      .to(receiverId)
+      .emit('cancel_friend_request', { senderId, friendRequestId });
+  }
 }
 
 // John | id: 1 => join 1

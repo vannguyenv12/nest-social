@@ -180,5 +180,11 @@ export class FriendService {
       throw new NotFoundException('Friend request does not exist');
 
     await friendRequest.deleteOne();
+
+    this.friendGateway.handleCancelRequest(
+      receiverId,
+      friendRequest.sender._id.toString(),
+      friendRequest._id.toString(),
+    );
   }
 }
