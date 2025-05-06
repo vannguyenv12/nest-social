@@ -105,6 +105,10 @@ export class PostService {
     return post;
   }
 
+  findOneWithReaction(id: string) {
+    return this.reactionService.findPostReaction(id);
+  }
+
   async findOneWithMyReaction(id: string, currentUser: IUserPayload) {
     const post = await this.postModel.findById(id).lean();
     if (!post) throw new NotFoundException('Post not found');
@@ -181,9 +185,14 @@ export class PostService {
     reactionCounts.set(type, value + 1);
 
     post.reactionsCount = reactionCounts;
-    await post.save();
+    const savedPost = await post.save();
+
+    const responsePost = plainToInstance(ResponsePostDto, savedPost, {
+      excludeExtraneousValues: true,
+    });
 
     // TODO: EMIT EVENT
+    this.postGateway.handleAddReaction(responsePost);
   }
 
   async removeReaction(

@@ -25,14 +25,16 @@ import { UploadMediaDto } from 'src/_cores/globals/dtos';
 import { DeleteMediaDto } from './dto/delete-media.dto';
 import { AddReactionDto } from './dto/add-reaction.dto';
 import { RemoveReactionDto } from './dto/remove-reaction.dto';
+import { ResponsePostReactionDto } from './dto/response-post-reaction.dto';
 
 @Controller('posts')
-@TransformDTO(ResponsePostDto)
+// @TransformDTO(ResponsePostDto)
 @UseGuards(AuthGuard, RoleGuard)
 export class PostController {
   constructor(private readonly postService: PostService) {}
 
   @Delete('reaction')
+  @TransformDTO(ResponsePostDto)
   deleteReaction(
     @Body() removeReactionDto: RemoveReactionDto,
     @CurrentUser() currentUser: IUserPayload,
@@ -41,6 +43,7 @@ export class PostController {
   }
 
   @Post()
+  @TransformDTO(ResponsePostDto)
   create(
     @Body() createPostDto: CreatePostDto,
     @CurrentUser() currentUser: IUserPayload,
@@ -49,6 +52,7 @@ export class PostController {
   }
 
   @Post('reaction')
+  @TransformDTO(ResponsePostDto)
   addReaction(
     @Body() addReactionDto: AddReactionDto,
     @CurrentUser() currentUser: IUserPayload,
@@ -57,6 +61,7 @@ export class PostController {
   }
 
   @Patch(':id/upload')
+  @TransformDTO(ResponsePostDto)
   uploadMedia(
     @Param('id', ParseObjectIdPipe) id: string,
     @Body() uploadMediaDtos: UploadMediaDto[],
@@ -65,6 +70,7 @@ export class PostController {
   }
 
   @Delete(':id/upload')
+  @TransformDTO(ResponsePostDto)
   deleteMedia(
     @Param('id', ParseObjectIdPipe) id: string,
     @Body() deleteMediaDto: DeleteMediaDto,
@@ -73,6 +79,7 @@ export class PostController {
   }
 
   @Get()
+  @TransformDTO(ResponsePostDto)
   findAll(
     @CurrentUser() currentUser: IUserPayload,
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
@@ -81,7 +88,14 @@ export class PostController {
     return this.postService.findAll(currentUser, limit, cursor);
   }
 
+  @Get(':id/reaction')
+  @TransformDTO(ResponsePostReactionDto)
+  findOneWithReaction(@Param('id', ParseObjectIdPipe) id: string) {
+    return this.postService.findOneWithReaction(id);
+  }
+
   @Get(':id')
+  @TransformDTO(ResponsePostDto)
   findOne(
     @Param('id', ParseObjectIdPipe) id: string,
     @CurrentUser() currentUser: IUserPayload,
@@ -91,6 +105,7 @@ export class PostController {
 
   @Patch(':id')
   @Roles('admin', 'user')
+  @TransformDTO(ResponsePostDto)
   update(
     @Param('id', ParseObjectIdPipe) id: string,
     @Body() updatePostDto: UpdatePostDto,
@@ -99,6 +114,7 @@ export class PostController {
   }
 
   @Delete(':id')
+  @TransformDTO(ResponsePostDto)
   remove(@Param('id', ParseObjectIdPipe) id: string) {
     return this.postService.remove(id);
   }

@@ -48,4 +48,10 @@ export class ReactionService {
     const reaction = await this.reactionModel.findByIdAndDelete(id);
     if (!reaction) throw new NotFoundException('Reaction not found');
   }
+
+  async findPostReaction(postId: string) {
+    return this.reactionModel
+      .find({ post: postId })
+      .populate('user', 'name avatar');
+  }
 }
