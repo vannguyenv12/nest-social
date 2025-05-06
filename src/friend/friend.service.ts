@@ -11,6 +11,7 @@ import { Model } from 'mongoose';
 import { UserService } from 'src/user/user.service';
 import { FriendGateway } from './friend.gateway';
 import { transformDto } from 'src/_cores/utils/transform-dto.utils';
+import { ResponseFriendRequestDto } from './dto/response-request-friend.dto';
 import { ResponseFriendDto } from './dto/response-friend.dto';
 
 @Injectable()
@@ -52,7 +53,7 @@ export class FriendService {
     );
 
     const responseFriendRequestDto = transformDto(
-      ResponseFriendDto,
+      ResponseFriendRequestDto,
       populatedFriendRequest,
     );
 
@@ -66,8 +67,9 @@ export class FriendService {
     @CurrentUser() currentUser: IUserPayload,
     friendRequestId: string,
   ) {
-    const friendRequest =
-      await this.friendRequestModel.findById(friendRequestId);
+    const friendRequest = await this.friendRequestModel
+      .findById(friendRequestId)
+      .populate('sender', 'name avatar');
 
     if (!friendRequest) {
       throw new NotFoundException('Friend request not found');
@@ -93,6 +95,24 @@ export class FriendService {
       friendRequest.receiver._id.toString(),
       friendRequest.sender._id.toString(),
     );
+
+    // FE: filter out the _id => friendsPending
+    // FE: push { } to => myFriends
+
+    // Sender: John -> send request Receiver: Thomas
+    // Logged: Thomas -> accept
+
+    const responseFriendRequestDto = transformDto(
+      ResponseFriendRequestDto,
+      friendRequest,
+    );
+
+    this.friendGateway.handleAcceptRequest({
+      friendRequestId,
+      _id: friendRequest.sender._id.toString(),
+      name: friendRequest.sender.name,
+      avatar: responseFriendRequestDto.senderAvatarUrl,
+    });
   }
 
   async rejectFriendRequest(

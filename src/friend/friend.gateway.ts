@@ -6,7 +6,7 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { ResponseFriendDto } from './dto/response-friend.dto';
+import { ResponseFriendRequestDto } from './dto/response-request-friend.dto';
 
 @WebSocketGateway({ cors: { origin: '*' } })
 export class FriendGateway {
@@ -14,15 +14,19 @@ export class FriendGateway {
   server: Server;
 
   @SubscribeMessage('join_room')
-  async handleEvent(
+  async handleJoinRoom(
     @MessageBody() userId: string,
     @ConnectedSocket() client: Socket,
   ) {
     await client.join(userId);
   }
 
-  handleSendFriendRequest(receiverId: string, data: ResponseFriendDto) {
+  handleSendFriendRequest(receiverId: string, data: ResponseFriendRequestDto) {
     this.server.to(receiverId).emit('send_friend_request', data);
+  }
+
+  handleAcceptRequest(data: any) {
+    this.server.to(data._id).emit('accept_friend', data);
   }
 }
 
