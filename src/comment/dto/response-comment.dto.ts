@@ -10,6 +10,7 @@ export class ResponseCommentDto {
   post: string;
   @Expose()
   @ObjectId()
+  @Transform(({ obj }) => (obj?.parent ? obj?.parent : null))
   parent: string;
 
   @Expose()
