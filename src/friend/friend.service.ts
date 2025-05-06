@@ -12,7 +12,6 @@ import { UserService } from 'src/user/user.service';
 import { FriendGateway } from './friend.gateway';
 import { transformDto } from 'src/_cores/utils/transform-dto.utils';
 import { ResponseFriendRequestDto } from './dto/response-request-friend.dto';
-import { ResponseFriendDto } from './dto/response-friend.dto';
 
 @Injectable()
 export class FriendService {
@@ -111,7 +110,7 @@ export class FriendService {
       friendRequestId,
       _id: friendRequest.sender._id.toString(),
       name: friendRequest.sender.name,
-      avatar: responseFriendRequestDto.senderAvatarUrl,
+      avatarUrl: responseFriendRequestDto.senderAvatarUrl,
     });
   }
 
@@ -136,6 +135,11 @@ export class FriendService {
 
     friendRequest.status = 'reject';
     await friendRequest.save();
+
+    this.friendGateway.handleRejectRequest(
+      friendRequest.sender._id.toString(),
+      friendRequestId,
+    );
   }
 
   async findOne(id: string) {
