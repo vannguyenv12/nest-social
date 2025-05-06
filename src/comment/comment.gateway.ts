@@ -19,4 +19,8 @@ export class CommentGateway {
 
     this.server.emit('comment_updated', { commentId, content, updatedAt });
   }
+
+  handleCommentRemove(commentId: string, parentId: string | null) {
+    this.server.emit('comment_delete', { commentId, parentId });
+  }
 }

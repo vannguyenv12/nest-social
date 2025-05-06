@@ -54,7 +54,6 @@ export class CommentService {
 
     const savedComment = await comment.save();
 
-    // TODO: EMIT EVENT
     const populatedComment = await this.findOne(savedComment._id.toString());
     const responseCommentDto = transformDto(
       ResponseCommentDto,
@@ -117,18 +116,20 @@ export class CommentService {
     );
 
     return comment;
-
-    // TODO: EMIT EVENT
   }
 
   async remove(id: string) {
     const comment = await this.commentModel.findByIdAndDelete(id);
     if (!comment) throw new NotFoundException('Comment not found');
 
+    // IF THIS IS A PARENT
     if (!comment.parent) {
       await this.commentModel.deleteMany({ parent: comment._id });
     }
 
-    // TODO: EMIT EVENT
+    this.commentGateway.handleCommentRemove(
+      id,
+      comment.parent ? comment.parent._id.toString() : null,
+    );
   }
 }
