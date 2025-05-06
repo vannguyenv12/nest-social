@@ -41,8 +41,10 @@ export class PostGateway {
   }
 
   handleAddReaction(post: ResponsePostDto) {
-    console.log('post', post);
-
     this.server.emit('post_add_reaction', post);
+  }
+
+  handleRemoveReaction(post: ResponsePostDto) {
+    this.server.emit('post_remove_reaction', post);
   }
 }

@@ -211,10 +211,18 @@ export class PostService {
 
     await this.reactionService.remove(existingReaction._id.toString());
 
-    await this.postModel.findByIdAndUpdate(post._id, {
-      $inc: { [`reactionsCount.${existingReaction.type}`]: -1 },
-    });
+    const savedPost = await this.postModel.findByIdAndUpdate(
+      post._id,
+      {
+        $inc: { [`reactionsCount.${existingReaction.type}`]: -1 },
+      },
+      { new: true },
+    );
 
     // TODO: EMIT EVENT
+    const responsePostDto = plainToInstance(ResponsePostDto, savedPost, {
+      excludeExtraneousValues: true,
+    });
+    this.postGateway.handleRemoveReaction(responsePostDto);
   }
 }
