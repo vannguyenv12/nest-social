@@ -43,11 +43,6 @@ export class CommentController {
     return this.commentService.getComments(postId);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.commentService.findOne(+id);
-  }
-
   @Patch(':id')
   @Roles('admin', 'user')
   update(
