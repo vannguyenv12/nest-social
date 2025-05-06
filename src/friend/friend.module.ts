@@ -7,6 +7,7 @@ import {
   FriendRequestSchema,
 } from './schemas/friend-request.schemas';
 import { UserModule } from 'src/user/user.module';
+import { FriendGateway } from './friend.gateway';
 
 @Module({
   imports: [
@@ -16,6 +17,6 @@ import { UserModule } from 'src/user/user.module';
     UserModule,
   ],
   controllers: [FriendController],
-  providers: [FriendService],
+  providers: [FriendService, FriendGateway],
 })
 export class FriendModule {}

@@ -6,14 +6,20 @@ export class ResponseFriendDto {
   @ObjectId()
   _id: string;
   @Expose()
-  name: string;
+  @Transform(({ obj }) => obj?.sender?._id)
+  senderId: string;
   @Expose()
-  email: string;
+  @Transform(({ obj }) => obj?.sender?.name)
+  senderName: string;
   @Expose()
   @Transform(({ obj }) =>
-    obj?.avatar?.public_id
-      ? `https://res.cloudinary.com/${process.env.CLOUDINARY_NAME}/image/upload/v${obj?.avatar?.version}/${obj?.avatar?.display_name}.${obj?.avatar?.format}`
+    obj?.sender?.avatar?.public_id
+      ? `https://res.cloudinary.com/${process.env.CLOUDINARY_NAME}/image/upload/v${obj?.sender?.avatar?.version}/${obj?.sender?.avatar?.display_name}.${obj?.sender?.avatar?.format}`
       : null,
   )
-  avatarUrl: string;
+  senderAvatarUrl: string;
+  @Expose()
+  createdAt: Date;
+  @Expose()
+  updatedAt: Date;
 }

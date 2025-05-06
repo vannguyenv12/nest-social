@@ -41,7 +41,10 @@ export class FriendService {
       status: 'pending',
     });
 
-    return friendRequest.save();
+    const savedFriend = await friendRequest.save();
+
+    // A -> B
+    //sender: A -> receiver: B
   }
 
   async acceptFriendRequest(
