@@ -9,6 +9,9 @@ import { InjectModel } from '@nestjs/mongoose';
 import { FriendRequest } from './schemas/friend-request.schemas';
 import { Model } from 'mongoose';
 import { UserService } from 'src/user/user.service';
+import { FriendGateway } from './friend.gateway';
+import { transformDto } from 'src/_cores/utils/transform-dto.utils';
+import { ResponseFriendDto } from './dto/response-friend.dto';
 
 @Injectable()
 export class FriendService {
@@ -16,6 +19,7 @@ export class FriendService {
     @InjectModel(FriendRequest.name)
     private friendRequestModel: Model<FriendRequest>,
     private userService: UserService,
+    private friendGateway: FriendGateway,
   ) {}
 
   async create(@CurrentUser() currentUser: IUserPayload, receiverId: string) {
@@ -41,10 +45,21 @@ export class FriendService {
       status: 'pending',
     });
 
-    const savedFriend = await friendRequest.save();
+    const savedFriendRequest = await friendRequest.save();
 
-    // A -> B
-    //sender: A -> receiver: B
+    const populatedFriendRequest = await this.findOne(
+      savedFriendRequest._id.toString(),
+    );
+
+    const responseFriendRequestDto = transformDto(
+      ResponseFriendDto,
+      populatedFriendRequest,
+    );
+
+    this.friendGateway.handleSendFriendRequest(
+      receiverId,
+      responseFriendRequestDto,
+    );
   }
 
   async acceptFriendRequest(
@@ -101,6 +116,17 @@ export class FriendService {
 
     friendRequest.status = 'reject';
     await friendRequest.save();
+  }
+
+  async findOne(id: string) {
+    const friend = await this.friendRequestModel
+      .findById(id)
+      .populate('sender', 'name email avatar')
+      .populate('receiver', 'name email avatar');
+
+    if (!friend) throw new NotFoundException('Friend request not found');
+
+    return friend;
   }
 
   getCurrentRequestPending(currentUser: IUserPayload) {
