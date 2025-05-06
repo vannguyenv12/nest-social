@@ -9,21 +9,33 @@ import { DeleteMediaDto } from './dto/delete-media.dto';
 import { AddReactionDto } from './dto/add-reaction.dto';
 import { ReactionService } from 'src/reaction/reaction.service';
 import { RemoveReactionDto } from './dto/remove-reaction.dto';
+import { PostGateway } from './post.gateway';
+import { plainToInstance } from 'class-transformer';
+import { ResponsePostDto } from './dto/response-post.dto';
 
 @Injectable()
 export class PostService {
   constructor(
     @InjectModel(Post.name) private postModel: Model<Post>,
     private reactionService: ReactionService,
+    private postGateway: PostGateway,
   ) {}
 
-  create(createPostDto: CreatePostDto, currentUser: IUserPayload) {
+  async create(createPostDto: CreatePostDto, currentUser: IUserPayload) {
     const newPost = new this.postModel({
       ...createPostDto,
       author: currentUser,
     });
 
-    return newPost.save();
+    const savedPost = await newPost.save();
+
+    const responsePost = plainToInstance(ResponsePostDto, savedPost, {
+      excludeExtraneousValues: true,
+    });
+
+    this.postGateway.handlePostCreate(responsePost);
+
+    return savedPost;
   }
 
   async uploadMedia(id: string, uploadMediaDtos: UploadMediaDto[]) {
