@@ -47,6 +47,8 @@ export class PostService {
     });
 
     await post.save();
+
+    this.postGateway.handleUploadMedia(id, uploadMediaDtos);
   }
 
   async removeMedia(id: string, deleteMediaDto: DeleteMediaDto) {
@@ -58,6 +60,8 @@ export class PostService {
     );
 
     await post.save();
+
+    this.postGateway.handleRemoveMedia(id, deleteMediaDto.mediaId);
   }
 
   async findAll(currentUser: IUserPayload, limit: number, cursor: string) {
