@@ -191,7 +191,6 @@ export class PostService {
       excludeExtraneousValues: true,
     });
 
-    // TODO: EMIT EVENT
     this.postGateway.handleAddReaction(responsePost);
   }
 
@@ -219,7 +218,6 @@ export class PostService {
       { new: true },
     );
 
-    // TODO: EMIT EVENT
     const responsePostDto = plainToInstance(ResponsePostDto, savedPost, {
       excludeExtraneousValues: true,
     });
