@@ -143,6 +143,8 @@ export class PostService {
     if (!post) {
       throw new NotFoundException('Post not found');
     }
+
+    this.postGateway.handleRemovePost(id);
   }
 
   async addReaction(addReactionDto: AddReactionDto, currentUser: IUserPayload) {

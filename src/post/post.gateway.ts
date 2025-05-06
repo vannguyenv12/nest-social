@@ -35,4 +35,8 @@ export class PostGateway {
   }) {
     this.server.emit('post_updated', data);
   }
+
+  handleRemovePost(postId: string) {
+    this.server.emit('post_deleted', postId);
+  }
 }
