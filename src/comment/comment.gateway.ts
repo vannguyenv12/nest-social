@@ -8,11 +8,15 @@ export class CommentGateway {
   server: Server;
 
   handleCommentCreate(postId: string, responseCommentDto: ResponseCommentDto) {
-    console.log({ postId, responseCommentDto });
-
     this.server.emit('comment_created', {
       postId,
       comment: responseCommentDto,
     });
+  }
+
+  handleCommentUpdate(commentId: string, content: string, updatedAt: Date) {
+    console.log({ commentId, content, updatedAt });
+
+    this.server.emit('comment_updated', { commentId, content, updatedAt });
   }
 }

@@ -90,10 +90,6 @@ export class CommentService {
     return finalResult;
   }
 
-  findAll() {
-    return `This action returns all comment`;
-  }
-
   async findOne(id: string) {
     const comment = await this.commentModel
       .findById(id)
@@ -113,6 +109,12 @@ export class CommentService {
     );
 
     if (!comment) throw new NotFoundException('Comment not found');
+
+    this.commentGateway.handleCommentUpdate(
+      id,
+      comment.content,
+      comment.updatedAt,
+    );
 
     return comment;
 

@@ -33,11 +33,6 @@ export class CommentController {
     return this.commentService.create(createCommentDto, currentUser);
   }
 
-  @Get()
-  findAll() {
-    return this.commentService.findAll();
-  }
-
   @Get('/post/:postId')
   getComments(@Param('postId', ParseObjectIdPipe) postId: string) {
     return this.commentService.getComments(postId);

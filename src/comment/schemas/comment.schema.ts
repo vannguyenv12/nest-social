@@ -18,6 +18,9 @@ export class Comment {
 
   @Prop({ required: true })
   content: string;
+
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export const CommentSchema = SchemaFactory.createForClass(Comment);
