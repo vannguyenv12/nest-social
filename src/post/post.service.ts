@@ -127,6 +127,13 @@ export class PostService {
       throw new NotFoundException('Post not found');
     }
 
+    this.postGateway.handlePostUpdate({
+      postId: id,
+      backgroundColor: post.backgroundColor,
+      content: post.content,
+      privacy: post.privacy,
+    });
+
     return post;
   }
 

@@ -26,4 +26,13 @@ export class PostGateway {
       mediaId,
     });
   }
+
+  handlePostUpdate(data: {
+    postId: string;
+    backgroundColor: string;
+    content: string;
+    privacy: IPrivacy;
+  }) {
+    this.server.emit('post_updated', data);
+  }
 }
