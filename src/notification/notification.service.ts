@@ -30,10 +30,27 @@ export class NotificationService {
     // TODO: REAL TIME
   }
 
-  findAll(currentUser: IUserPayload) {
-    return this.notificationModel
-      .find({ receiver: currentUser._id })
+  async findAll(currentUser: IUserPayload, limit: number, cursor: string) {
+    const query: Record<string, any> = { receiver: currentUser._id };
+
+    if (cursor) {
+      query.createdAt = { $lt: new Date(cursor) };
+    }
+
+    const notifications = await this.notificationModel
+      .find(query)
+      .limit(limit + 1)
+      .sort({ createdAt: -1 })
       .populate('sender', 'name avatar');
+
+    const hasNextPage = notifications.length > limit;
+    const items = hasNextPage ? notifications.slice(0, -1) : notifications;
+
+    return {
+      items,
+      hasNextPage,
+      cursor: hasNextPage ? items[items.length - 1].createdAt : null,
+    };
   }
 
   findOne(id: number) {

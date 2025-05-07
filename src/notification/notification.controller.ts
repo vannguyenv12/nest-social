@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Param, Patch, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  DefaultValuePipe,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { UpdateNotificationDto } from './dto/update-notification.dto';
 import { NotificationService } from './notification.service';
 import { CurrentUser } from 'src/_cores/decorators/current-user.decorator';
@@ -13,8 +23,12 @@ export class NotificationController {
   constructor(private readonly notificationService: NotificationService) {}
 
   @Get()
-  findAll(@CurrentUser() currentUser: IUserPayload) {
-    return this.notificationService.findAll(currentUser);
+  findAll(
+    @CurrentUser() currentUser: IUserPayload,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+    @Query('cursor') cursor: string,
+  ) {
+    return this.notificationService.findAll(currentUser, limit, cursor);
   }
 
   @Patch(':id')
