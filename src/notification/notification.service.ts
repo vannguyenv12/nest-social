@@ -11,8 +11,6 @@ export class NotificationService {
     private notificationModel: Model<Notification>,
   ) {}
 
-  // Get user notification
-
   async create(
     senderId: string,
     receiverId: string,
@@ -32,8 +30,10 @@ export class NotificationService {
     // TODO: REAL TIME
   }
 
-  findAll() {
-    return `This action returns all notification`;
+  findAll(currentUser: IUserPayload) {
+    return this.notificationModel
+      .find({ receiver: currentUser._id })
+      .populate('sender', 'name avatar');
   }
 
   findOne(id: number) {
