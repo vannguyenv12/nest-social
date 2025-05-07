@@ -10,6 +10,7 @@ type IRole = 'user' | 'admin';
 type IPrivacy = 'public' | 'private' | 'friends';
 type IReactionType = 'like' | 'wow' | 'love' | 'angry' | 'haha' | 'happy';
 type IFriendRequestStatus = 'accept' | 'reject' | 'pending';
+type INotificationType = 'friend_request' | 'like' | 'comment';
 
 declare namespace Express {
   export interface Request {
