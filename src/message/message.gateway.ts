@@ -26,7 +26,7 @@ export class MessageGateway
     console.log(`Client disconnect ${client.id}`);
   }
 
-  @SubscribeMessage('join_conversation')
+  @SubscribeMessage('join')
   async handleJoinConversation(
     @MessageBody() conversationId: string, // FE
     @ConnectedSocket() client: Socket, // === socket

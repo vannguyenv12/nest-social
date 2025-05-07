@@ -6,6 +6,7 @@ import {
   Notification,
   NotificationSchema,
 } from './schemas/notification.schema';
+import { NotificationGateway } from './notification.gateway';
 
 @Global()
 @Module({
@@ -15,7 +16,7 @@ import {
     ]),
   ],
   controllers: [NotificationController],
-  providers: [NotificationService],
+  providers: [NotificationService, NotificationGateway],
   exports: [NotificationService],
 })
 export class NotificationModule {}
