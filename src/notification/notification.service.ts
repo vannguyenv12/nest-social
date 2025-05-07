@@ -1,11 +1,35 @@
 import { Injectable } from '@nestjs/common';
-import { CreateNotificationDto } from './dto/create-notification.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 import { UpdateNotificationDto } from './dto/update-notification.dto';
+import { Notification } from './schemas/notification.schema';
 
 @Injectable()
 export class NotificationService {
-  create(createNotificationDto: CreateNotificationDto) {
-    return 'This action adds a new notification';
+  constructor(
+    @InjectModel(Notification.name)
+    private notificationModel: Model<Notification>,
+  ) {}
+
+  // Get user notification
+
+  async create(
+    senderId: string,
+    receiverId: string,
+    type: INotificationType,
+    content: string,
+    linkToId?: string,
+  ) {
+    const notification = new this.notificationModel({
+      sender: senderId,
+      receiver: receiverId,
+      type,
+      content,
+      linkToId,
+    });
+
+    await notification.save();
+    // TODO: REAL TIME
   }
 
   findAll() {

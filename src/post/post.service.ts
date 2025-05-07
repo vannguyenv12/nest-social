@@ -12,12 +12,14 @@ import { RemoveReactionDto } from './dto/remove-reaction.dto';
 import { PostGateway } from './post.gateway';
 import { plainToInstance } from 'class-transformer';
 import { ResponsePostDto } from './dto/response-post.dto';
+import { NotificationService } from 'src/notification/notification.service';
 
 @Injectable()
 export class PostService {
   constructor(
     @InjectModel(Post.name) private postModel: Model<Post>,
     private reactionService: ReactionService,
+    private notificationService: NotificationService,
     private postGateway: PostGateway,
   ) {}
 
@@ -192,6 +194,16 @@ export class PostService {
     });
 
     this.postGateway.handleAddReaction(responsePost);
+
+    const notificationContent = `${currentUser.name} has react ${type} to your post`;
+
+    await this.notificationService.create(
+      currentUser._id,
+      post.author._id.toString(),
+      'reaction',
+      notificationContent,
+      post._id.toString(),
+    );
   }
 
   async removeReaction(
