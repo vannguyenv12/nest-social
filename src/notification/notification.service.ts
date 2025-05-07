@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { UpdateNotificationDto } from './dto/update-notification.dto';
@@ -53,15 +53,26 @@ export class NotificationService {
     };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} notification`;
+  async findOne(id: string) {
+    const notification = await this.notificationModel.findById(id);
+
+    if (!notification) throw new NotFoundException('Notification not found');
+
+    return notification;
   }
 
-  update(id: number, updateNotificationDto: UpdateNotificationDto) {
-    return `This action updates a #${id} notification`;
+  async markAsRead(id: string) {
+    const notification = await this.findOne(id);
+    notification.isRead = true;
+    await notification.save();
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} notification`;
+  async markAllRead(currentUser: IUserPayload) {
+    await this.notificationModel.updateMany(
+      { receiver: currentUser._id, isRead: false },
+      {
+        isRead: true,
+      },
+    );
   }
 }

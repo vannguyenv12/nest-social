@@ -9,7 +9,6 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { UpdateNotificationDto } from './dto/update-notification.dto';
 import { NotificationService } from './notification.service';
 import { CurrentUser } from 'src/_cores/decorators/current-user.decorator';
 import { AuthGuard } from 'src/_cores/guards/auth.guard';
@@ -31,11 +30,13 @@ export class NotificationController {
     return this.notificationService.findAll(currentUser, limit, cursor);
   }
 
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateNotificationDto: UpdateNotificationDto,
-  ) {
-    return this.notificationService.update(+id, updateNotificationDto);
+  @Patch(':id/read')
+  markAsRead(@Param('id') id: string) {
+    return this.notificationService.markAsRead(id);
+  }
+
+  @Patch('read-all')
+  markAllRead(@CurrentUser() currentUser: IUserPayload) {
+    return this.notificationService.markAllRead(currentUser);
   }
 }
