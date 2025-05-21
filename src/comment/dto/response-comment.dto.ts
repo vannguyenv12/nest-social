@@ -5,9 +5,11 @@ export class ResponseCommentDto {
   @Expose()
   @ObjectId()
   _id: string;
+
   @Expose()
   @ObjectId()
-  post: string;
+  @Transform(({ obj }) => obj.post)
+  postId: string;
   @Expose()
   @ObjectId()
   @Transform(({ obj }) => (obj?.parent ? obj?.parent : null))

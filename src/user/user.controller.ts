@@ -31,7 +31,7 @@ export class UserController {
 
   @Get('/profile')
   getCurrentUser(@CurrentUser() currentUser: IUserPayload) {
-    return this.userService.getCurrentUser(currentUser);
+    return this.userService.getCurrentUser(currentUser._id);
   }
 
   @Post('/upload-avatar')
@@ -55,8 +55,9 @@ export class UserController {
     @Query('q') q: string,
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
     @Query('cursor') cursor: string,
+    @CurrentUser() currentUser: IUserPayload,
   ) {
-    return this.userService.findAll(q, limit, cursor);
+    return this.userService.findAll(currentUser, q, limit, cursor);
   }
 
   @Get(':id')

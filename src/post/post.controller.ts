@@ -33,7 +33,7 @@ import { ResponsePostReactionDto } from './dto/response-post-reaction.dto';
 export class PostController {
   constructor(private readonly postService: PostService) {}
 
-  @Delete('reaction')
+  @Post('delete-reaction')
   @TransformDTO(ResponsePostDto)
   deleteReaction(
     @Body() removeReactionDto: RemoveReactionDto,
@@ -67,6 +67,15 @@ export class PostController {
     @Body() uploadMediaDtos: UploadMediaDto[],
   ) {
     return this.postService.uploadMedia(id, uploadMediaDtos);
+  }
+
+  @Patch(':id/replace')
+  @TransformDTO(ResponsePostDto)
+  replaceMedia(
+    @Param('id', ParseObjectIdPipe) id: string,
+    @Body() uploadMediaDtos: UploadMediaDto[],
+  ) {
+    return this.postService.replaceMedia(id, uploadMediaDtos);
   }
 
   @Delete(':id/upload')

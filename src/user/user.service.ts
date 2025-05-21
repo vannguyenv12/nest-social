@@ -4,12 +4,21 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User } from './schemas/user.schema';
 import { Model } from 'mongoose';
 import { UploadMediaDto } from 'src/_cores/globals/dtos';
+import { FriendRequest } from 'src/friend/schemas/friend-request.schemas';
 
 @Injectable()
 export class UserService {
-  constructor(@InjectModel(User.name) private userModel: Model<User>) {}
+  constructor(
+    @InjectModel(User.name) private userModel: Model<User>,
+    @InjectModel(FriendRequest.name) private friendModel: Model<FriendRequest>,
+  ) {}
 
-  async findAll(q: string, limit: number, cursor: string) {
+  async findAll(
+    currentUser: IUserPayload,
+    q: string,
+    limit: number,
+    cursor: string,
+  ) {
     const query: Record<string, any> = { isActive: true };
 
     if (q) {
@@ -23,6 +32,20 @@ export class UserService {
       query.email = { $gt: cursor };
     }
 
+    const user = await this.findOne(currentUser._id);
+    const friendIds = new Set(
+      (user.friends || []).map((fr) => fr._id.toString()),
+    );
+
+    const sentRequests = await this.friendModel
+      .find({ sender: currentUser._id, status: 'pending' })
+      .select('receiver')
+      .lean();
+
+    const sentRequestReceiverIds = new Set(
+      sentRequests.map((req) => req.receiver._id.toString()),
+    );
+
     const users = await this.userModel
       .find(query)
       .sort({ email: 1 })
@@ -30,7 +53,11 @@ export class UserService {
       .lean();
 
     const hasNextPage = users.length > limit;
-    const items = hasNextPage ? users.slice(0, 1) : users;
+    const items = (hasNextPage ? users.slice(0, limit) : users).map((user) => ({
+      ...user,
+      isFriend: friendIds.has(user._id.toString()),
+      isSentFriendRequest: sentRequestReceiverIds.has(user._id.toString()),
+    }));
 
     return {
       items,
@@ -39,9 +66,9 @@ export class UserService {
     };
   }
 
-  async getCurrentUser(currentUser: IUserPayload) {
+  async getCurrentUser(userId: string) {
     const user = await this.userModel.findOne({
-      _id: currentUser._id,
+      _id: userId,
       isActive: true,
     });
     if (!user) throw new NotFoundException('User not found');

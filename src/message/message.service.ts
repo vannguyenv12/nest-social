@@ -42,7 +42,7 @@ export class MessageService {
       .populate('seenBy', 'name avatar');
 
     const hasNextPage = messages.length > limit;
-    const items = hasNextPage ? messages.slice(0, 1) : messages;
+    const items = hasNextPage ? messages.slice(0, limit) : messages;
 
     return {
       items,

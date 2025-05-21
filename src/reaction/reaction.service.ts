@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Reaction } from './schemas/reaction.schema';
 import { Model } from 'mongoose';
 import { AddReactionDto } from 'src/post/dto/add-reaction.dto';
+import { Reaction } from './schemas/reaction.schema';
 
 @Injectable()
 export class ReactionService {
@@ -47,6 +47,15 @@ export class ReactionService {
   async remove(id: string) {
     const reaction = await this.reactionModel.findByIdAndDelete(id);
     if (!reaction) throw new NotFoundException('Reaction not found');
+  }
+
+  async delete(postId: string, userId: string) {
+    const data = await this.reactionModel.findOneAndDelete({
+      post: postId,
+      user: userId,
+    });
+
+    return data;
   }
 
   async findPostReaction(postId: string) {

@@ -60,7 +60,7 @@ export class CommentService {
       populatedComment,
     );
 
-    this.commentGateway.handleCommentCreate(postId, responseCommentDto);
+    this.commentGateway.handleCommentCreate(responseCommentDto);
   }
 
   async getComments(postId: string) {
@@ -68,6 +68,7 @@ export class CommentService {
       .find({ post: postId })
       .populate('userComment')
       .populate('replyToUser')
+      .populate('parent')
       .lean();
 
     const finalResult: any[] = [];
@@ -75,11 +76,11 @@ export class CommentService {
     for (const comment of comments) {
       if (!comment.parent) {
         finalResult.push({ ...comment, replies: [] });
-      } else {
+      }
+      if (comment.parent) {
         const foundRootComment = finalResult.find(
-          (c) => c._id.toString() === comment.parent?._id.toString(),
+          (c) => c._id.toString() === comment.parent?._id?.toString(),
         );
-
         if (foundRootComment) {
           foundRootComment.replies.push(comment);
         }

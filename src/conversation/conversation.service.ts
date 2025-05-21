@@ -28,10 +28,12 @@ export class ConversationService {
   ) {
     const { participantId } = createPrivateConversationDto;
 
-    const existingConversation = await this.conversationModel.findOne({
-      isGroup: false,
-      participants: { $all: [currentUser._id, participantId] },
-    });
+    const existingConversation = await this.conversationModel
+      .findOne({
+        isGroup: false,
+        participants: { $all: [currentUser._id, participantId] },
+      })
+      .populate('participants', 'name email avatar');
 
     if (existingConversation) return existingConversation;
 
@@ -76,10 +78,19 @@ export class ConversationService {
       .sort({ updatedAt: -1 })
       .limit(limit + 1)
       .populate('groupOwner', 'email name')
+      .populate('participants', 'name email avatar')
+      // .populate('lastMessage', 'text sender')
+      .populate({
+        path: 'lastMessage',
+        populate: {
+          path: 'sender',
+          select: 'name _id',
+        },
+      })
       .lean();
 
     const hasNextPage = conversations.length > limit;
-    const items = hasNextPage ? conversations.slice(0, 1) : conversations;
+    const items = hasNextPage ? conversations.slice(0, limit) : conversations;
 
     return {
       items,

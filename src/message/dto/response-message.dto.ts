@@ -23,6 +23,7 @@ export class ResponseMessageDto {
   _id: string;
   @Expose()
   @ObjectId()
+  @Transform(({ obj }) => obj?.conversation)
   conversation: string;
   @Expose()
   @Transform(({ obj }) => obj?.sender?._id)

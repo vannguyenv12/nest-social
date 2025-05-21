@@ -30,14 +30,31 @@ export class FriendService {
       throw new BadRequestException('Cannot send a friend request to yourself');
 
     // Prevent duplicate the same friend
+    // const existingFriendRequest = await this.friendRequestModel.findOne({
+    //   sender: currentUser._id,
+    //   receiver: receiver._id,
+    //   status: { $in: ['pending', 'accept'] },
+    // });
+
     const existingFriendRequest = await this.friendRequestModel.findOne({
-      sender: currentUser._id,
-      receiver: receiver._id,
-      status: { $in: ['pending', 'accept'] },
+      $or: [
+        {
+          sender: currentUser._id,
+          receiver: receiver._id,
+          status: { $in: ['pending', 'accept'] },
+        },
+        {
+          sender: receiver._id,
+          receiver: currentUser._id,
+          status: { $in: ['pending', 'accept'] },
+        },
+      ],
     });
 
     if (existingFriendRequest)
-      throw new BadRequestException('The friend request already sent');
+      throw new BadRequestException(
+        'This user already sent request to you, please accept that',
+      );
 
     const friendRequest = new this.friendRequestModel({
       sender: currentUser._id,
@@ -159,8 +176,8 @@ export class FriendService {
         receiver: currentUser._id,
         status: 'pending',
       })
-      .populate('sender', 'name email avatar')
-      .populate('receiver', 'name email avatar');
+      .populate('sender', 'name email avatar coverPhoto')
+      .populate('receiver', 'name email avatar coverPhoto');
   }
 
   getCurrentFriends(currentUser: IUserPayload) {

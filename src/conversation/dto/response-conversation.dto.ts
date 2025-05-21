@@ -3,6 +3,7 @@ import { ObjectId } from 'src/_cores/decorators/object-id.decorator';
 
 export class ParticipantDto {
   @Expose()
+  @ObjectId()
   _id: string;
   @Expose()
   email: string;
@@ -47,6 +48,16 @@ export class ResponseConversationDto {
       : null,
   )
   groupAvatarUrl: string;
+  @Expose()
+  @Transform(({ obj }) => obj?.lastMessage?.text)
+  lastMessage: string;
+  @Expose()
+  @ObjectId()
+  @Transform(({ obj }) => obj?.lastMessage?.sender?._id)
+  senderIdLastMessage: string;
+  @Expose()
+  @Transform(({ obj }) => obj?.lastMessage?.sender?.name)
+  senderLastMessage: string;
   @Expose()
   createdAt: Date;
   @Expose()

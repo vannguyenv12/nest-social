@@ -33,4 +33,9 @@ export class ResponseUserDto {
   coverPhotoUrl: string;
   @Expose()
   isActive: boolean;
+
+  @Expose()
+  isFriend: boolean;
+  @Expose()
+  isSentFriendRequest: boolean;
 }

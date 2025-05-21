@@ -7,11 +7,8 @@ export class CommentGateway {
   @WebSocketServer()
   server: Server;
 
-  handleCommentCreate(postId: string, responseCommentDto: ResponseCommentDto) {
-    this.server.emit('comment_created', {
-      postId,
-      comment: responseCommentDto,
-    });
+  handleCommentCreate(responseCommentDto: ResponseCommentDto) {
+    this.server.emit('comment_created', responseCommentDto);
   }
 
   handleCommentUpdate(commentId: string, content: string, updatedAt: Date) {
@@ -21,6 +18,6 @@ export class CommentGateway {
   }
 
   handleCommentRemove(commentId: string, parentId: string | null) {
-    this.server.emit('comment_delete', { commentId, parentId });
+    this.server.emit('comment_deleted', { commentId, parentId });
   }
 }
