@@ -59,6 +59,10 @@ export class ResponseConversationDto {
   @Transform(({ obj }) => obj?.lastMessage?.sender?.name)
   senderLastMessage: string;
   @Expose()
+  lastMessageAt: string;
+  @Expose()
+  isLastMessageSeen: boolean;
+  @Expose()
   createdAt: Date;
   @Expose()
   updatedAt: Date;

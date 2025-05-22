@@ -31,12 +31,46 @@ export class MessageService {
     };
 
     if (cursor) {
-      query.createdAt = { $gt: new Date(cursor) };
+      // query.createdAt = { $gt: new Date(cursor) };
+      query.createdAt = { $lt: new Date(cursor) };
     }
 
     const messages = await this.messageModel
       .find(query)
-      .sort({ createdAt: 1 })
+      // .sort({ createdAt: 1 }) // old -> new -> top -> bottom
+      .sort({ createdAt: -1 }) // new → old
+      .limit(limit + 1)
+      .populate('sender', 'name avatar')
+      .populate('seenBy', 'name avatar');
+
+    const hasNextPage = messages.length > limit;
+    const items = hasNextPage ? messages.slice(0, limit) : messages;
+
+    return {
+      items,
+      hasNextPage,
+      cursor: hasNextPage ? items[items.length - 1].createdAt : null,
+    };
+  }
+
+  async getAllMessagesV2(
+    conversationId: string,
+    limit: number,
+    cursor: string,
+  ) {
+    const query: Record<string, any> = {
+      conversation: conversationId,
+    };
+
+    if (cursor) {
+      // query.createdAt = { $gt: new Date(cursor) };
+      query.createdAt = { $lt: new Date(cursor) };
+    }
+
+    const messages = await this.messageModel
+      .find(query)
+      // .sort({ createdAt: 1 })
+      .sort({ createdAt: -1 }) // new → old
       .limit(limit + 1)
       .populate('sender', 'name avatar')
       .populate('seenBy', 'name avatar');
@@ -82,6 +116,11 @@ export class MessageService {
     await this.conversationService.updateLastMessage(
       conversationId,
       savedMessage._id.toString(),
+    );
+
+    await this.conversationService.updateLastMessageAt(
+      conversationId,
+      savedMessage,
     );
 
     const newMessage = await this.messageModel
@@ -156,31 +195,74 @@ export class MessageService {
     );
   }
 
-  async markSeenMessage(id: string, currentUser: IUserPayload) {
-    const message = await this.findOne(id);
+  // async markSeenMessage(id: string, currentUser: IUserPayload) {
+  //   const message = await this.findOne(id);
 
-    const alreadySeen = message.seenBy.some(
-      (u) => u._id.toString() === currentUser._id,
+  //   const alreadySeen = message.seenBy.some(
+  //     (u) => u._id.toString() === currentUser._id,
+  //   );
+
+  //   if (!alreadySeen) {
+  //     const user = await this.userService.findOne(currentUser._id);
+  //     message.seenBy.push(user);
+  //     await message.save();
+
+  //     const responseUserDto = plainToInstance(ResponseUserDto, user, {
+  //       excludeExtraneousValues: true,
+  //     });
+
+  //     this.messageGateway.handleSeenMessage(
+  //       message.conversation._id.toString(),
+  //       message._id.toString(),
+  //       {
+  //         seenById: responseUserDto._id,
+  //         seenByName: responseUserDto.name,
+  //         seenByAvatarUrl: responseUserDto.avatarUrl,
+  //       },
+  //     );
+  //   }
+  // }
+
+  async markSeenMessage(id: string, currentUser: IUserPayload) {
+    const userId = currentUser._id;
+
+    // Update the message by adding the user to `seenBy` if not already present
+    const message = await this.messageModel
+      .findOneAndUpdate(
+        { _id: id },
+        { $addToSet: { seenBy: userId } }, // ensures no duplicates
+        { new: true }, // return the updated document
+      )
+      .populate('seenBy') // optional: if you need to inspect or return seenBy
+      .populate('conversation');
+
+    if (!message) {
+      throw new NotFoundException('Message not found');
+    }
+
+    // Check if the user was just added to seenBy
+    const wasJustAdded = message.seenBy.some(
+      (user: any) => user._id.toString() === userId.toString(),
     );
 
-    if (!alreadySeen) {
-      const user = await this.userService.findOne(currentUser._id);
-      message.seenBy.push(user);
-      await message.save();
+    // If user was already in seenBy before, skip further processing
+    if (!wasJustAdded) return;
 
-      const responseUserDto = plainToInstance(ResponseUserDto, user, {
-        excludeExtraneousValues: true,
-      });
+    // DTO
+    const user = await this.userService.findOne(userId);
 
-      this.messageGateway.handleSeenMessage(
-        message.conversation._id.toString(),
-        message._id.toString(),
-        {
-          seenById: responseUserDto._id,
-          seenByName: responseUserDto.name,
-          seenByAvatarUrl: responseUserDto.avatarUrl,
-        },
-      );
-    }
+    const responseUserDto = plainToInstance(ResponseUserDto, user, {
+      excludeExtraneousValues: true,
+    });
+
+    this.messageGateway.handleSeenMessage(
+      message.conversation._id.toString(),
+      message._id.toString(),
+      {
+        seenById: responseUserDto._id,
+        seenByName: responseUserDto.name,
+        seenByAvatarUrl: responseUserDto.avatarUrl,
+      },
+    );
   }
 }

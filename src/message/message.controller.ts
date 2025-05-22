@@ -48,6 +48,15 @@ export class MessageController {
     return this.messageService.getAllMessages(conversationId, limit, cursor);
   }
 
+  @Get('/v2/conversation/:conversationId')
+  findAllMessageBottomToTop(
+    @Param('conversationId', ParseObjectIdPipe) conversationId: string,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+    @Query('cursor') cursor: string,
+  ) {
+    return this.messageService.getAllMessagesV2(conversationId, limit, cursor);
+  }
+
   @Get(':id')
   findOne(@Param('id', ParseObjectIdPipe) id: string) {
     return this.messageService.findOne(id);

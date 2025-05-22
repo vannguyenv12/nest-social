@@ -13,6 +13,7 @@ import { Model } from 'mongoose';
 import { AddParticipantsDto } from './dto/add-participants.dto';
 import { UserService } from 'src/user/user.service';
 import { UserDocument } from 'src/user/schemas/user.schema';
+import { MessageDocument } from 'src/message/schemas/message.schema';
 
 @Injectable()
 export class ConversationService {
@@ -69,13 +70,13 @@ export class ConversationService {
     };
 
     if (cursor) {
-      query.updatedAt = { $lt: new Date(cursor) };
+      query.lastMessageAt = { $lt: new Date(cursor) };
     }
 
     const conversations = await this.conversationModel
       .find(query)
       .populate('lastMessage')
-      .sort({ updatedAt: -1 })
+      .sort({ lastMessageAt: -1 })
       .limit(limit + 1)
       .populate('groupOwner', 'email name')
       .populate('participants', 'name email avatar')
@@ -92,8 +93,20 @@ export class ConversationService {
     const hasNextPage = conversations.length > limit;
     const items = hasNextPage ? conversations.slice(0, limit) : conversations;
 
+    const resultItems = items.map((conversation) => {
+      const seenBy = conversation.lastMessage?.seenBy || [];
+      const isLastMessageSeen = seenBy.some(
+        (userId: any) => userId.toString() === currentUser._id.toString(),
+      );
+
+      return {
+        ...conversation,
+        isLastMessageSeen,
+      };
+    });
+
     return {
-      items,
+      items: resultItems,
       hasNextPage,
       cursor: hasNextPage ? items[items.length - 1].updatedAt : null,
     };
@@ -213,5 +226,12 @@ export class ConversationService {
     );
 
     if (!conversation) throw new NotFoundException('Conversation not found');
+  }
+
+  async updateLastMessageAt(conversationId: string, message: MessageDocument) {
+    await this.conversationModel.findByIdAndUpdate(conversationId, {
+      lastMessage: message._id,
+      lastMessageAt: message.createdAt,
+    });
   }
 }

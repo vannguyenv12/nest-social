@@ -31,6 +31,7 @@ export class MessageGateway
     @MessageBody() conversationId: string, // FE
     @ConnectedSocket() client: Socket, // === socket
   ) {
+    console.log('join room', conversationId);
     await client.join(conversationId);
   }
 

@@ -1,8 +1,8 @@
-import { IsArray, IsNotEmpty, IsOptional } from 'class-validator';
+import { IsArray, IsOptional } from 'class-validator';
 import { MediaType } from 'src/_cores/globals/class';
 
 export class SendMessageDto {
-  @IsNotEmpty()
+  @IsOptional()
   text: string;
   @IsOptional()
   @IsArray()

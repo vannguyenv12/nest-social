@@ -25,19 +25,28 @@ export class FriendGateway {
     this.server.to(receiverId).emit('send_friend_request', data);
   }
 
-  handleAcceptRequest(data: {
-    friendRequestId: string;
-    _id: string;
-    name: string;
-    avatarUrl: string;
-  }) {
-    this.server.to(data._id).emit('accept_friend_request', data);
+  handleUnfriend(targetUserId: string, unfriendedById: string) {
+    this.server.to(targetUserId).emit('un_friend', unfriendedById);
   }
 
-  handleRejectRequest(senderId: string, friendRequestId: string) {
-    console.log({ senderId, friendRequestId });
+  handleAcceptRequest(
+    senderId: string,
+    data: ResponseFriendRequestDto,
+    whoEmitEventId: string,
+  ) {
+    this.server
+      .to(senderId)
+      .emit('accept_friend_request', data, whoEmitEventId);
+  }
 
-    this.server.to(senderId).emit('reject_friend_request', friendRequestId);
+  handleRejectRequest(
+    senderId: string,
+    friendRequestId: string,
+    whoEmitEventId: string,
+  ) {
+    this.server
+      .to(senderId)
+      .emit('reject_friend_request', friendRequestId, whoEmitEventId);
   }
 
   handleCancelRequest(

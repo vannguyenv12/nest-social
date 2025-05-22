@@ -141,4 +141,18 @@ export class UserService {
     if (!user) throw new NotFoundException('User not found');
     return user.friends;
   }
+
+  async checkIsFriend(userId: string, friendId: string): Promise<boolean> {
+    const user = await this.userModel.findById(userId).select('friends');
+    if (!user) return false;
+    return user.friends.map((fr) => fr._id.toString()).includes(friendId);
+  }
+
+  async removeFriend(userId: string, friendId: string): Promise<void> {
+    await this.userModel.findByIdAndUpdate(
+      userId,
+      { $pull: { friends: friendId } },
+      { new: true },
+    );
+  }
 }

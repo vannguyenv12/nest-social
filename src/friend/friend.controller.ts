@@ -1,5 +1,6 @@
 import {
   Controller,
+  Delete,
   Get,
   HttpCode,
   Param,
@@ -27,6 +28,15 @@ export class FriendController {
     @Param('receiverId', ParseObjectIdPipe) receiverId: string,
   ) {
     return this.friendService.create(currentUser, receiverId);
+  }
+
+  @Delete('/:friendId')
+  @TransformDTO(ResponseFriendRequestDto)
+  unFriend(
+    @CurrentUser() currentUser: IUserPayload,
+    @Param('friendId', ParseObjectIdPipe) friendId: string,
+  ) {
+    return this.friendService.unFriend(currentUser, friendId);
   }
 
   @HttpCode(200)
